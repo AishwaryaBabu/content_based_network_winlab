@@ -89,12 +89,14 @@ void CreateConnectionsList(char* argv)
     fstream inputFile;
     char temp[maxLineLength];
 
+    int i = 1;
     inputFile.open(connectionsFilename.c_str(), fstream::in);
 
     while(!inputFile.eof())
     {
         inputFile.getline(temp, maxLineLength);
-        connectionsList.push_back(string(temp));
+        if(i > 2)
+            connectionsList.push_back(string(temp));
     }
 
     inputFile.close();

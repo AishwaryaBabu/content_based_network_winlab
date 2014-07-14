@@ -209,13 +209,15 @@ string SetupAddress(char *argv)
     string hostname;
     
     inputFile.open(connectionsFilename.c_str(), fstream::in);
+    int i = 1;
 
     while(!inputFile.eof())
     {
         inputFile.getline(temp, maxLineLength);
 //        connectionsList.push_back(string(temp));
-        if(string(temp) != "127.0.0.1")
+        if(i > 2)
             hostname = string(temp);
+        i++;
     }
 
     inputFile.close();

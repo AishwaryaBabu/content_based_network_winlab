@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
                 if(family==2)
                 {
-                struct sockaddr_in *ip4addr = (struct sockaddr_in *)ifa->ifa_addr; //ifa_broadaddr;
+                struct sockaddr_in *ip4addr = (struct sockaddr_in *)ifa->ifa_broadaddr; //ifa_addr;
                 char ipAddress[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &(ip4addr->sin_addr), ipAddress, INET_ADDRSTRLEN);
                 string ipAddressStr(ipAddress);
