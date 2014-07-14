@@ -1,2 +1,2 @@
--Receiving request to self .. not going across interface 
--Cannot add/ cp from parent directory 
+-host: Receiving request to self .. not going across interface 
+-router: glibc memory allocation for thread creation
