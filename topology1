@@ -1,0 +1,11 @@
+4
+5
+h1 r1
+h2 r5
+h3 r2
+h4 r4
+r1 h1 r5 r2 r3
+r2 h3 r1
+r3 r1 r4
+r4 h4 r3 
+r5 h2 r1
