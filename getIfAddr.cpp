@@ -47,13 +47,15 @@ int main(int argc, char *argv[])
 
                 if(family==2)
                 {
-                struct sockaddr_in *ip4addr = (struct sockaddr_in *)ifa->ifa_broadaddr; //ifa_addr;
+                struct sockaddr_in *ip4addr = (struct sockaddr_in *)ifa->ifa_addr; //ifa_broadaddr;
+                struct sockaddr_in *ip4Broadaddr = (struct sockaddr_in *)ifa->ifa_broadaddr; //ifa_broadaddr;
                 char ipAddress[INET_ADDRSTRLEN];
+                char ipBroadAddress[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &(ip4addr->sin_addr), ipAddress, INET_ADDRSTRLEN);
-                string ipAddressStr(ipAddress);
+                inet_ntop(AF_INET, &(ip4Broadaddr->sin_addr), ipBroadAddress, INET_ADDRSTRLEN);
 //              cout<<"broadcast address: "<<ipAddressStr<<endl;
 //                (if((ifName != "lo") && (ifName != "eth0")))
-                connectionsFile<<ipAddress<<endl;
+                connectionsFile<<ipAddress<<" "<<ipBroadAddress<<endl;
 //              connectionsFile<<ifName<<" "<<afFamily<<" "<<ipAddress<<endl;
                 }
         }

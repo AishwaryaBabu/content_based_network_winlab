@@ -1,6 +1,11 @@
 #!/bin/bash
 
+#obtain args from labWiki Experiment
 sudo make
-sudo ./contentList
 sudo ./getIfAddr
-sudo ./host connectionsList contentList
+sudo mkdir "Host" 
+sudo cp host ./"Host"
+sudo cp connectionsList ./"Host"
+sudo cd ./"Host"
+sudo ./host connectionsList
+

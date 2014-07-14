@@ -391,13 +391,12 @@ void SendingPort::init()
     throw "Scoket Bind Error";
   }
    
-  if (bcastflag_ == 1) 
+  if (bcastflag_ == 1)
     if (setsockopt(sockfd_,SOL_SOCKET,SO_BROADCAST,&bcastflag_,sizeof(bcastflag_)) == -1   )
          {
            perror("setsockopt");
 	   throw "Set broadcast option failed.";
          }; 
-
   //create sending buffer
   sendingbuf_ = new char[MTU_SIZE+1];
   return; 

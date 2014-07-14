@@ -28,7 +28,13 @@ using namespace std;
 static const int maxLineLength=400;
 static const int receivingPortNum = 6200;
 static const int sendingPortNum = 6300;
-static const int advPortNum = 4200;
+static const int advPortNum = 6100;
+
+struct hostnames
+{
+    string hostname_self;
+    string hostname_bcast;
+};
 
 struct adv
 {
@@ -201,28 +207,30 @@ void *receivedata(void *args)
 
 }//Closes void
 
-string SetupAddress(char *argv)
+struct hostnames SetupAddress(char *argv)
 {
     string connectionsFilename(argv);
     fstream inputFile;
-    char temp[maxLineLength];
-    string hostname;
+    char temp1[maxLineLength];
+    char temp2[maxLineLength];
+    struct hostnames Hname;
     
     inputFile.open(connectionsFilename.c_str(), fstream::in);
     int i = 1;
 
-    while(!inputFile.eof())
+    while(inputFile >> temp1 >> temp2)
     {
-        inputFile.getline(temp, maxLineLength);
-//        connectionsList.push_back(string(temp));
         if(i > 2)
-            hostname = string(temp);
+        {
+            Hname.hostname_self = string(temp1);
+            Hname.hostname_bcast = string(temp2);
+        }
         i++;
     }
 
     inputFile.close();
 
-    return hostname;
+    return Hname;
     
 }
 
@@ -242,26 +250,30 @@ int main(int argc, char * argv[])
     mySendingPort2 *my_adv_port;//Sending port for advertisements
     LossyReceivingPort *my_res_port; //Receiving port information
 
-    string hostname; 
-    hostname = SetupAddress(argv[1]);
+    struct hostnames Hname; 
+    Hname = SetupAddress(argv[1]);
+
+    cout<<"hostnames: "<<Hname.hostname_self<<" "<<Hname.hostname_bcast<<endl;
 
     try{
-        my_req_addr = new Address(hostname.c_str(), sendingPortNum);
-        my_res_addr = new Address(hostname.c_str(), receivingPortNum);
-        my_adv_addr = new Address(hostname.c_str(), advPortNum);
-        router_addr = new Address(hostname.c_str(), receivingPortNum); //same as self receiving interface since we work on broadcasts 
+        my_req_addr = new Address(Hname.hostname_self.c_str(), sendingPortNum);
+        my_res_addr = new Address(Hname.hostname_self.c_str(), receivingPortNum);
+        my_adv_addr = new Address(Hname.hostname_self.c_str(), advPortNum);
+        router_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum);  
 
         //Initialize requesting port (sending)
         my_req_port = new mySendingPort();
         my_req_port->setAddress(my_req_addr);
         my_req_port->setRemoteAddress(router_addr);
+//        my_req_port->setRemoteAddress(my_res_addr);
         my_req_port->setBroadcast();
-        my_req_port->init();                               //<<<<<PROBLEMM>>>>>>>
+        my_req_port->init();                               
 
         //Initialize advertising port (sending)
         my_adv_port = new mySendingPort2();
         my_adv_port->setAddress(my_adv_addr);
         my_adv_port->setRemoteAddress(router_addr);
+//        my_adv_port->setRemoteAddress(my_res_addr); //Shouldnt matter that it is the same as the receiving address since the we broadcast
         my_adv_port->setBroadcast();
         my_adv_port->init();
 

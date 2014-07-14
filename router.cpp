@@ -26,7 +26,7 @@
 using namespace std;
 
 static int globalTimer=0; //!< Global timer - Clock for the Routing and Pending Request Tables
-static vector<string> connectionsList; //!< Connections table- 2D vector mapping destination address to sending port+"receiving port"(interface) - MAY NOT BE REQUIRED WHEN WE WORK WITH BROADCAST ADDRESS 
+static vector<vector<string> >connectionsList; //!< Connections table- 2D vector mapping destination address to sending port+"receiving port"(interface) - MAY NOT BE REQUIRED WHEN WE WORK WITH BROADCAST ADDRESS 
 static const int maxLineLength=400;
 static const int receivingPortNum = 6200;
 static const int sendingPortNum = 6300;
@@ -85,18 +85,24 @@ void CreateConnectionsList(char* argv)
 {
 
     string connectionsFilename(argv); 
-//    vector<string> inputDataLines;
+    //    vector<string> inputDataLines;
     fstream inputFile;
-    char temp[maxLineLength];
+    char temp1[maxLineLength];
+    char temp2[maxLineLength];
 
     int i = 1;
     inputFile.open(connectionsFilename.c_str(), fstream::in);
 
-    while(!inputFile.eof())
+    while(inputFile >> temp1 >> temp2)
     {
-        inputFile.getline(temp, maxLineLength);
         if(i > 2)
-            connectionsList.push_back(string(temp));
+        {
+            vector<string> listElement;
+            listElement.push_back(string(temp1));
+            listElement.push_back(string(temp2));
+            connectionsList.push_back(listElement);
+        }
+        i++;
     }
 
     inputFile.close();
@@ -151,7 +157,7 @@ void AddRoutingTableEntry(int contentId, string recInterface, int numHops) //CHA
     }
 
     cout<<"Ad received - Routing Table:"<<endl;   
-//    Display2DVector(routingTable);
+    //    Display2DVector(routingTable);
 }
 
 /*!
@@ -175,7 +181,7 @@ void DeleteRoutingTableEntry(int row)
 {
     routingTable.erase(routingTable.begin()+row);
     cout<<"Deleted entry - Routing Tab:"<<endl;
-//    Display2DVector(routingTable);
+    //    Display2DVector(routingTable);
 
 }
 
@@ -210,7 +216,7 @@ string getReceivingInterface(int requestedContentId)
             return routingTable[i].recInterface; //Returns receiving port number   
         }
     }
-//    return -1;
+    //    return -1;
     return NULL;
 }
 
@@ -252,7 +258,7 @@ void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, str
     prtElem.requestingHostId = requestingHostId;
 
     //Maintain destination Port numbers at PRT  
-//    int destPort = SearchConnectionsTable(receivingPort);
+    //    int destPort = SearchConnectionsTable(receivingPort);
 
     bool contentExists = false;
     for(unsigned int i = 0; i < pendingRequestTable.size(); i++)
@@ -273,7 +279,7 @@ void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, str
 
     }
     cout<<"Request recd - Pending Req Tab:"<<endl;
-//    Display2DVector(pendingRequestTable);
+    //    Display2DVector(pendingRequestTable);
 }
 
 /*!
@@ -283,10 +289,10 @@ void UpdatePendingRequestTableTTL()
 {
     for(unsigned int i=0; i<pendingRequestTable.size(); i++)
     {
-            pendingRequestTable[i].timeToExp = pendingRequestTable[i].timeToExp - timerWrap;
+        pendingRequestTable[i].timeToExp = pendingRequestTable[i].timeToExp - timerWrap;
     }
     cout<<"Updated TTL - Pending Request Table"<<endl;
-//    Display2DVector(pendingRequestTable);
+    //    Display2DVector(pendingRequestTable);
 }
 
 /*!
@@ -307,8 +313,8 @@ void DeletePendingRequestTableEntry(int requestedContentId, int requestingHostId
     cout<<"Deleted entry - PRT:"<<endl;
     if(pendingRequestTable.size()==0)
         cout<<"No pending req"<<endl;
-//    else
-//        Display2DVector(pendingRequestTable);
+    //    else
+    //        Display2DVector(pendingRequestTable);
 
 }
 
@@ -393,7 +399,7 @@ void* NodeRecProc(void* arg)
                 //Look up routing table based on content id and Forward to appropriate next hop
 
                 string nextHopRecvInterface = getReceivingInterface(requestedContentId);
-//                int nextHopDestPortNum = SearchConnectionsTable(nextHopRecvPortNum);
+                //                int nextHopDestPortNum = SearchConnectionsTable(nextHopRecvPortNum);
                 Address* dstAddr = new Address(nextHopRecvInterface.c_str(), receivingPortNum);
                 sh->fwdSendPort->setRemoteAddress(dstAddr);
                 sh->fwdSendPort->sendPacket(recvPacket);
@@ -465,7 +471,7 @@ void* NodeRecProc(void* arg)
                     //BroadcastPacket(destPortNumToSkip, recvPacket);
                     for(unsigned int i = 0; i < connectionsList.size(); i++)
                     {
-                        string destInterface = connectionsList[i];
+                        string destInterface = connectionsList[i][1];
                         if(destInterfaceToSkip != destInterface)
                         {
                             //                        cout<<destPort<<endl;
@@ -485,7 +491,7 @@ void* NodeRecProc(void* arg)
 /*!
   \brief Sets up the receiving and sending port numbers for a given connection and calls the thread function
  */
-void StartNodeThread(pthread_t* thread, string hostname)
+void StartNodeThread(pthread_t* thread, vector<string> hostnames)
 {
 
     //setup ports numbers
@@ -496,8 +502,8 @@ void StartNodeThread(pthread_t* thread, string hostname)
     LossyReceivingPort* recvPort; //receiving port corr to recvAddr;
 
     try{
-        recvAddr = new Address(hostname.c_str(), receivingPortNum);  //CHANGE "localhost" to second argument and ports[0] to 6200
-        sendAddr = new Address(hostname.c_str(), sendingPortNum);  //CHANGE "localhost" to second argument and ports[2] to 6300
+        recvAddr = new Address(hostnames[0].c_str(), receivingPortNum);  //CHANGE "localhost" to second argument and ports[0] to 6200
+        sendAddr = new Address(hostnames[0].c_str(), sendingPortNum);  //CHANGE "localhost" to second argument and ports[2] to 6300
         //        dstAddr =  new Address("localhost", ports[2]); //NEEDS TO GO and edit common.cpp line 380 to get rid of assertion
 
         recvPort = new LossyReceivingPort(lossPercent);
@@ -521,7 +527,7 @@ void StartNodeThread(pthread_t* thread, string hostname)
     sh = (struct cShared*)malloc(sizeof(struct cShared));
     sh->fwdRecvPort = recvPort;
     sh->fwdSendPort = sendPort;
-    sh->receivingInterface = hostname;
+    sh->receivingInterface = hostnames[0];
     //    sh->max = n;
     //    pthread_t thread;
     pthread_create(thread, 0, &NodeRecProc, sh);
@@ -534,7 +540,7 @@ void StartNodeThread(pthread_t* thread, string hostname)
 int main(int argc, char* argv[])
 {
 
-    //cout<<"I am "<<argv[1]<<endl;
+    cout<<"I am router"<<endl;
     //sender 4000
     //receiver localhost 4001 
 
