@@ -35,9 +35,10 @@ static const int sendingPortNum = 6300;
   Argument to be send to <NodeRecProc>(void *arg)
  */
 struct cShared{
-    string receivingInterface;
+//    string receivingInterface;
     LossyReceivingPort* fwdRecvPort;
     mySendingPort* fwdSendPort;
+    int position;
     //  int max;
 };
 
@@ -394,7 +395,10 @@ void* NodeRecProc(void* arg)
             {
                 int requestedContentId = int(recvPacket->accessHeader()->getOctet(1));
                 int requestingHostId = int(recvPacket->accessHeader()->getOctet(2)); 
-                string receivingInterface = sh->receivingInterface;
+//                string receivingInterface = sh->receivingInterface;
+                int position = sh->position;
+                string receivingInterface = connectionsList[position][0];
+
 
                 //Look up routing table based on content id and Forward to appropriate next hop
 
@@ -431,7 +435,11 @@ void* NodeRecProc(void* arg)
             else if(recvPacket->accessHeader()->getOctet(0) == '2')
             {
                 int receivedContentId = int(recvPacket->accessHeader()->getOctet(1));
-                string receivingInterface = sh->receivingInterface;
+
+//                string receivingInterface = sh->receivingInterface;
+                int position = sh->position;
+                string receivingInterface = connectionsList[position][0];
+
                 int numHops = int(recvPacket->accessHeader()->getOctet(2));
 
                 int currentHops = getNumberHops(receivedContentId);
@@ -491,7 +499,7 @@ void* NodeRecProc(void* arg)
 /*!
   \brief Sets up the receiving and sending port numbers for a given connection and calls the thread function
  */
-void StartNodeThread(pthread_t* thread, vector<string> hostnames)
+void StartNodeThread(pthread_t* thread, int position)
 {
 
     //setup ports numbers
@@ -502,8 +510,8 @@ void StartNodeThread(pthread_t* thread, vector<string> hostnames)
     LossyReceivingPort* recvPort; //receiving port corr to recvAddr;
 
     try{
-        recvAddr = new Address(hostnames[0].c_str(), receivingPortNum);  //CHANGE "localhost" to second argument and ports[0] to 6200
-        sendAddr = new Address(hostnames[0].c_str(), sendingPortNum);  //CHANGE "localhost" to second argument and ports[2] to 6300
+        recvAddr = new Address(connectionsList[position][0].c_str(), receivingPortNum);  //CHANGE "localhost" to second argument and ports[0] to 6200
+        sendAddr = new Address(connectionsList[position][0].c_str(), sendingPortNum);  //CHANGE "localhost" to second argument and ports[2] to 6300
         //        dstAddr =  new Address("localhost", ports[2]); //NEEDS TO GO and edit common.cpp line 380 to get rid of assertion
 
         recvPort = new LossyReceivingPort(lossPercent);
@@ -527,7 +535,8 @@ void StartNodeThread(pthread_t* thread, vector<string> hostnames)
     sh = (struct cShared*)malloc(sizeof(struct cShared));
     sh->fwdRecvPort = recvPort;
     sh->fwdSendPort = sendPort;
-    sh->receivingInterface = hostnames[0];
+//    sh->receivingInterface = hostnames[0];
+    sh->position = position;
     //    sh->max = n;
     //    pthread_t thread;
     pthread_create(thread, 0, &NodeRecProc, sh);
@@ -554,7 +563,7 @@ int main(int argc, char* argv[])
 
     for(int i = 0; i < N; i++)
     {
-        StartNodeThread(&(threads[i]), connectionsList[i]);
+        StartNodeThread(&(threads[i]), i);
     }
     ExpiryTimer();
     for(int i = 0; i < N; i++)
