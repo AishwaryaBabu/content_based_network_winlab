@@ -75,6 +75,18 @@ void Display2DVector(vector<vector<int> > nameOfVector)
 }
 
 /*!
+  \brief Displays contents of Connections list
+*/
+void DisplayConnectionsList()
+{
+    cout<<"Connections List: "<<endl;
+    for(unsigned int i = 0; i < connectionsList.size(); i++)
+    {
+        cout<<connectionsList[i][0]<<" "<<connectionsList[i][1]<<endl;
+    }
+    cout<<endl;
+}
+/*!
   \brief Creates a list of mapping between receiving, destination and sending ports
 
   A connection between 2 devices comprises 4 ports. This table maintains the corresponding port numbers for receiving, destination and sending ports that are used by these 2 devices. The port numbers are calculated by a formula. 
@@ -115,7 +127,7 @@ void CreateConnectionsList(char* argv)
 void DisplayRoutingTable()
 {
     cout<<"Routing Table: "<<endl;
-    for(int i = 0; i < routingTable.size(); i++)
+    for(unsigned int i = 0; i < routingTable.size(); i++)
     {
         cout<<routingTable[i].contentId<<" "<<routingTable[i].recInterface<<" "<<routingTable[i].numHops<<" "<<routingTable[i].timeToExp<<endl;
     }
@@ -273,7 +285,7 @@ bool contentIdExists(int requestedContentId)
 void DisplayPendingRequestTable()
 {
     cout<<"PRT Table: "<<endl;
-    for(int i = 0; i < pendingRequestTable.size(); i++)
+    for(unsigned int i = 0; i < pendingRequestTable.size(); i++)
     {
         cout<<pendingRequestTable[i].requestedContentId<<" "<<pendingRequestTable[i].requestingHostId<<" "<<pendingRequestTable[i].recInterface<<" "<<pendingRequestTable[i].timeToExp<<endl;
     }
