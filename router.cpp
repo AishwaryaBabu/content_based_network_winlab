@@ -110,6 +110,18 @@ void CreateConnectionsList(char* argv)
 }
 
 /*!
+  \brief Displays contents of Routing table
+*/
+void DisplayRoutingTable()
+{
+    cout<<"Routing Table: "<<endl;
+    for(int i = 0; i < routingTable.size(); i++)
+    {
+        cout<<routingTable[i].contentId<<" "<<routingTable[i].recInterface<<" "<<routingTable[i].numHops<<" "<<routingTable[i].timeToExp<<endl;
+    }
+}
+
+/*!
   \brief Adds a new routing table entry or edits the timer on an already existing entry
 
   If a new advertisement packet is received a new entry is made in the Routing table. If it is an update for an already existing entry the timer is updated.
@@ -157,8 +169,10 @@ void AddRoutingTableEntry(int contentId, string recInterface, int numHops) //CHA
         }
     }
 
-    cout<<"Ad received - Routing Table:"<<endl;   
+    //cout<<"Ad received - Routing Table:"<<endl;   
     //    Display2DVector(routingTable);
+    cout<<"Ad received: "<<endl;
+    DisplayRoutingTable();
 }
 
 /*!
@@ -254,6 +268,19 @@ bool contentIdExists(int requestedContentId)
 }
 
 /*!
+  \brief Displays contents of Pending Request table
+*/
+void DisplayPendingRequestTable()
+{
+    cout<<"PRT Table: "<<endl;
+    for(int i = 0; i < pendingRequestTable.size(); i++)
+    {
+        cout<<pendingRequestTable[i].requestedContentId<<" "<<pendingRequestTable[i].requestingHostId<<" "<<pendingRequestTable[i].recInterface<<" "<<pendingRequestTable[i].timeToExp<<endl;
+    }
+}
+
+
+/*!
   \brief Make a new entry in the Pending request Table or update an already existing entry
  */
 void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, string recInterface) //USE HOSTNAME? BROADCAST IP INSTEAD
@@ -283,8 +310,10 @@ void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, str
         pendingRequestTable.push_back(prtElem);
 
     }
-    cout<<"Request recd - Pending Req Tab:"<<endl;
+//    cout<<"Request recd - Pending Req Tab:"<<endl;
     //    Display2DVector(pendingRequestTable);
+    cout<<"Request Received: "<<endl;
+    DisplayPendingRequestTable();
 }
 
 /*!
