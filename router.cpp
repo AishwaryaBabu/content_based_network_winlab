@@ -514,8 +514,8 @@ void StartNodeThread(pthread_t* thread, int position)
     LossyReceivingPort* recvPort; //receiving port corr to recvAddr;
 
     try{
-        recvAddr = new Address(connectionsList[position][0].c_str(), receivingPortNum);  //CHANGE "localhost" to second argument and ports[0] to 6200
-        sendAddr = new Address(connectionsList[position][0].c_str(), sendingPortNum);  //CHANGE "localhost" to second argument and ports[2] to 6300
+        recvAddr = new Address(connectionsList[position][0].c_str(), receivingPortNum+position);  //CHANGE "localhost" to second argument and ports[0] to 6200
+        sendAddr = new Address(connectionsList[position][0].c_str(), sendingPortNum+position);  //CHANGE "localhost" to second argument and ports[2] to 6300
         //        dstAddr =  new Address("localhost", ports[2]); //NEEDS TO GO and edit common.cpp line 380 to get rid of assertion
 
         recvPort = new LossyReceivingPort(lossPercent);
@@ -539,7 +539,7 @@ void StartNodeThread(pthread_t* thread, int position)
     sh = (struct cShared*)malloc(sizeof(struct cShared));
     sh->fwdRecvPort = recvPort;
     sh->fwdSendPort = sendPort;
-//    sh->receivingInterface = hostnames[0];
+//    sh->receivingInterface = hostnames[0]; //Change to new instead of malloc
     sh->position = position;
     //    sh->max = n;
     //    pthread_t thread;

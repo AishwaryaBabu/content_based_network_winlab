@@ -6,6 +6,6 @@ sudo ./getIfAddr
 sudo mkdir "Host" 
 sudo cp host ./"Host"
 sudo cp connectionsList ./"Host"
-sudo cd ./"Host"
+cd ./"Host"
 sudo ./host connectionsList
 
