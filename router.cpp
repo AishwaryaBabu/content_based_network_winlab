@@ -480,7 +480,6 @@ void* NodeRecProc(void* arg)
             else if(recvPacket->accessHeader()->getOctet(0) == '2')
             {
                 int receivedContentId = int(recvPacket->accessHeader()->getOctet(1));
-
 //                string receivingInterface = sh->receivingInterface;
                 int position = sh->position;
                 string receivingInterface = connectionsList[position][0];
@@ -577,7 +576,8 @@ void StartNodeThread(pthread_t* thread, int position)
 
     //pthread_create() - with sender
     struct cShared *sh;
-    sh = (struct cShared*)malloc(sizeof(struct cShared));
+//    sh = (struct cShared*)malloc(sizeof(struct cShared));
+    sh = new struct cShared;
     sh->fwdRecvPort = recvPort;
     sh->fwdSendPort = sendPort;
 //    sh->receivingInterface = hostnames[0]; //Change to new instead of malloc
@@ -601,6 +601,7 @@ int main(int argc, char* argv[])
     //CREATE CONNECTIONS LIST: COPY BROADCAST ADDRESSES INTO VECTOR
     CreateConnectionsList(argv[1]);
     //    Display2DVector(connectionsList);
+    DisplayConnectionsList();
 
     int N = connectionsList.size();
 
