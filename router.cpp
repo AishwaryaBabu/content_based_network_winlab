@@ -217,8 +217,12 @@ string getReceivingInterface(int requestedContentId)
             return routingTable[i].recInterface; //Returns receiving port number   
         }
     }
-    //    return -1;
-    return NULL;
+//    return NULL;
+    return ""; 
+
+//return NULL gave terminate called after throwing an instance of 'std::logic_error'
+//  what():  basic_string::_S_construct null not valid
+
 }
 
 /*!
