@@ -6,6 +6,6 @@ gdb --args ./router.cpp connectionsList ----> tells gdb to run the program with 
 
 -host: Receiving request to self .. not going across interface 
 
-
-
 -router: glibc memory allocation for thread creation
+
+-common.cpp : 463 ----> check the emptyAddr

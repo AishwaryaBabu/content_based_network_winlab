@@ -431,7 +431,7 @@ void* NodeRecProc(void* arg)
     //Packet received : needs to be checked for appropriate forwarding and editing of table
     while(true)
     {
-        cout<<"At: "<<sh->receivingInterface<<" thread id: "<<(int)pthread_self()<<endl;
+//        cout<<"At: "<<sh->receivingInterface<<" thread id: "<<(int)pthread_self()<<endl;
 
         recvPacket = sh->fwdRecvPort->receivePacket();
         if(recvPacket != NULL)
