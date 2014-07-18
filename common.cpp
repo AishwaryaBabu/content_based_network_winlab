@@ -12,48 +12,48 @@ using namespace std;
 //
 PacketHdr::PacketHdr()
 { 
-  length_ = 0;  
-  info_ = new  unsigned char[MAX_HEADER_SIZE] ;
+    length_ = 0;  
+    info_ = new  unsigned char[MAX_HEADER_SIZE] ;
 }
 
 int PacketHdr::getIntegerInfo(int position)
 {
-  int val;
-  unsigned char *p = info_ +position;
-  val = *(p++);
-  val = val << 8 | *(p++);
-  val = val << 8 | *(p++);
-  val = val << 8 | *(p);
-  
-  return val;
+    int val;
+    unsigned char *p = info_ +position;
+    val = *(p++);
+    val = val << 8 | *(p++);
+    val = val << 8 | *(p++);
+    val = val << 8 | *(p);
+
+    return val;
 }
 
 short PacketHdr::getShortIntegerInfo(int position)
 {
-  short val;
-  unsigned char *p = info_ + position;
-  val = *(p++);
-  val = val << 8 | *(p++);
+    short val;
+    unsigned char *p = info_ + position;
+    val = *(p++);
+    val = val << 8 | *(p++);
 
-  return val;
+    return val;
 }
 
 void PacketHdr::setIntegerInfo(int a, int position)
 {
-  unsigned char *p = info_ + position;
-  *(p++) =  a >> 24;
-  *(p++) = (a >> 16) & 0xFF;
-  *(p++) = (a >> 8) & 0xFF;
-  *(p++) =  a & 0xFF;
-  length_ +=4;
+    unsigned char *p = info_ + position;
+    *(p++) =  a >> 24;
+    *(p++) = (a >> 16) & 0xFF;
+    *(p++) = (a >> 8) & 0xFF;
+    *(p++) =  a & 0xFF;
+    length_ +=4;
 }
 
 void PacketHdr::setShortIntegerInfo(short b, int position)
 {
-  unsigned char *p = info_ + position;
-  *(p++) =  b >> 8;
-  *(p++) =  b & 0xFF;
-  length_+=2;
+    unsigned char *p = info_ + position;
+    *(p++) =  b >> 8;
+    *(p++) =  b & 0xFF;
+    length_+=2;
 }
 
 
@@ -62,10 +62,10 @@ void PacketHdr::setShortIntegerInfo(short b, int position)
 
 Packet::Packet()
 {
-  size_ = 0;
-  length_ = DEFAULT_PAYLOAD_SIZE;
-  payload_ = new char[DEFAULT_PAYLOAD_SIZE];
-  header_ = new PacketHdr();
+    size_ = 0;
+    length_ = DEFAULT_PAYLOAD_SIZE;
+    payload_ = new char[DEFAULT_PAYLOAD_SIZE];
+    header_ = new PacketHdr();
 }
 
 /**
@@ -75,10 +75,10 @@ Packet::Packet()
  */
 Packet::Packet(int buffer_length)
 {
-  size_ = 0;
-  length_ = buffer_length;
-  payload_ = new char[buffer_length];
-  header_ = new PacketHdr();
+    size_ = 0;
+    length_ = buffer_length;
+    payload_ = new char[buffer_length];
+    header_ = new PacketHdr();
 }
 
 /** 
@@ -93,25 +93,25 @@ Packet::Packet(int buffer_length)
 
 void Packet::setPayloadSize(int size)
 {
-  size_ =  size;
-  if (size > length_) {
-    if (payload_ != NULL) delete [] payload_;
-    length_ = (int)(1.5 * size);
-    payload_ =  new char[length_];
-  }
+    size_ =  size;
+    if (size > length_) {
+        if (payload_ != NULL) delete [] payload_;
+        length_ = (int)(1.5 * size);
+        payload_ =  new char[length_];
+    }
 }
 
- /** 
-  *  A function to fill payload.
-  *  user can specify the content of payload for applications like audio/video playback...
-  */
+/** 
+ *  A function to fill payload.
+ *  user can specify the content of payload for applications like audio/video playback...
+ */
 int Packet::fillPayload(int size, char *inputstream)
 {
-  setPayloadSize(size);
-  if (memcpy((char *)payload_, (char *)inputstream,  size) == NULL) {
-    throw "Fill payload Failed";
-  }
-  return 0;
+    setPayloadSize(size);
+    if (memcpy((char *)payload_, (char *)inputstream,  size) == NULL) {
+        throw "Fill payload Failed";
+    }
+    return 0;
 }
 
 /**
@@ -120,12 +120,12 @@ int Packet::fillPayload(int size, char *inputstream)
 
 int Packet::makePacket( char *streambuf )
 {
-  streambuf[0]= ( header_->getSize() ) & 0xff;
-  streambuf[1]=  0x00;
-  memcpy(streambuf+1, header_->accessInfo(), header_->getSize());
-  memcpy(streambuf+1+header_->getSize(), payload_, size_);
-  
-  return 1+size_+ header_->getSize();
+    streambuf[0]= ( header_->getSize() ) & 0xff;
+    streambuf[1]=  0x00;
+    memcpy(streambuf+1, header_->accessInfo(), header_->getSize());
+    memcpy(streambuf+1+header_->getSize(), payload_, size_);
+
+    return 1+size_+ header_->getSize();
 }
 
 /**
@@ -134,11 +134,11 @@ int Packet::makePacket( char *streambuf )
 void Packet::extractHeader( char *streambuf )
 {
 
-//EDIT
-  unsigned char* p= (unsigned char*)streambuf; 
-  int a  = *(p++);
-  header_->setHeaderSize(a);
-  memcpy( header_->accessInfo(), p ,a);   
+    //EDIT
+    unsigned char* p= (unsigned char*)streambuf; 
+    int a  = *(p++);
+    header_->setHeaderSize(a);
+    memcpy( header_->accessInfo(), p ,a);   
 }
 
 
@@ -147,14 +147,14 @@ void Packet::extractHeader( char *streambuf )
 
 Address::Address():port_(-1)
 {   
-  hostname_[0] = '\0';  
-  macaddr_[0] = '\0';
+    hostname_[0] = '\0';  
+    macaddr_[0] = '\0';
 }
 
 Address::Address(const char* hostname, short port)
 { 
-   setPort(port); 
-   setHostname(hostname);
+    setPort(port); 
+    setHostname(hostname);
 }
 
 /**
@@ -165,53 +165,53 @@ Address::Address(const char* hostname, short port)
  */
 void Address::setHWAddrFromColonFormat(const char* colonmac)
 {  
-  char HexChar;
-  //First verify the address
-  int Count  = 0;
-  int num_mac_char = 0;
-  /* Two ASCII characters per byte of binary data */
-  bool error_end = false;
-  while (!error_end)
+    char HexChar;
+    //First verify the address
+    int Count  = 0;
+    int num_mac_char = 0;
+    /* Two ASCII characters per byte of binary data */
+    bool error_end = false;
+    while (!error_end)
     { /* Scan string for first non-hex character.  Also stop scanning at end
          of string (HexChar == 0), or when out of six binary storage space */
-      HexChar = (char)colonmac[Count++];
-      if (HexChar == ':') continue;     
-      if (HexChar > 0x39) HexChar = HexChar | 0x20;  /* Convert upper case to lower */
-      if ( (HexChar == 0x00) || num_mac_char  >= (MAC_ADDR_LENGTH * 2) ||
-           (!(((HexChar >= 0x30) && (HexChar <= 0x39))||  /* 0 - 9 */
-             ((HexChar >= 0x61) && (HexChar <= 0x66))) ) ) /* a - f */ 
-	{
-	  error_end = true;
-	} else 
+        HexChar = (char)colonmac[Count++];
+        if (HexChar == ':') continue;     
+        if (HexChar > 0x39) HexChar = HexChar | 0x20;  /* Convert upper case to lower */
+        if ( (HexChar == 0x00) || num_mac_char  >= (MAC_ADDR_LENGTH * 2) ||
+                (!(((HexChar >= 0x30) && (HexChar <= 0x39))||  /* 0 - 9 */
+                   ((HexChar >= 0x61) && (HexChar <= 0x66))) ) ) /* a - f */ 
+        {
+            error_end = true;
+        } else 
             num_mac_char++;
     }
-  if (num_mac_char != MAC_ADDR_LENGTH * 2 )
-    throw "Given Wrong MAC address Format.";
+    if (num_mac_char != MAC_ADDR_LENGTH * 2 )
+        throw "Given Wrong MAC address Format.";
 
-  // Conversion
-  unsigned char HexValue = 0x00;
-  Count = 0;
-  num_mac_char = 0;
-  int mac_byte_num = 0;
-  while (mac_byte_num < MAC_ADDR_LENGTH )
+    // Conversion
+    unsigned char HexValue = 0x00;
+    Count = 0;
+    num_mac_char = 0;
+    int mac_byte_num = 0;
+    while (mac_byte_num < MAC_ADDR_LENGTH )
     {
-      HexChar = (char)colonmac[Count++];
-      if (HexChar == ':') continue;
-      num_mac_char++;  // locate a HEX character
-      if (HexChar > 0x39)
-        HexChar = HexChar | 0x20;  /* Convert upper case to lower */
-      HexChar -= 0x30;
-      if (HexChar > 0x09)  /* HexChar is "a" - "f" */
-	HexChar -= 0x27;
-      HexValue = (HexValue << 4) | HexChar;
-      if (num_mac_char % 2  == 0 ) /* If we've converted two ASCII chars... */
+        HexChar = (char)colonmac[Count++];
+        if (HexChar == ':') continue;
+        num_mac_char++;  // locate a HEX character
+        if (HexChar > 0x39)
+            HexChar = HexChar | 0x20;  /* Convert upper case to lower */
+        HexChar -= 0x30;
+        if (HexChar > 0x09)  /* HexChar is "a" - "f" */
+            HexChar -= 0x27;
+        HexValue = (HexValue << 4) | HexChar;
+        if (num_mac_char % 2  == 0 ) /* If we've converted two ASCII chars... */
         {
-          macaddr_[mac_byte_num] = HexValue;
-	  HexValue = 0x0;
-	  mac_byte_num++;
+            macaddr_[mac_byte_num] = HexValue;
+            HexValue = 0x0;
+            mac_byte_num++;
         }
     }  
-  return;   
+    return;   
 }
 
 
@@ -220,12 +220,12 @@ void Address::setHWAddrFromColonFormat(const char* colonmac)
  */
 char *Address::convertHWAddrToColonFormat()
 {
-  char *colonformat =  new char[17];
-  //printf("HW Address: %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",u[0], u[1], u[2], u[3], u[4], u[5]);
-  sprintf(colonformat,"%02X:%02X:%02X:%02X:%02X:%02X",
-          macaddr_[0],macaddr_[1],macaddr_[2],macaddr_[3],macaddr_[4],macaddr_[5]);
-  // cout << colonformat << endl;
-  return colonformat;
+    char *colonformat =  new char[17];
+    //printf("HW Address: %2.2x:%2.2x:%2.2x:%2.2x:%2.2x:%2.2x\n",u[0], u[1], u[2], u[3], u[4], u[5]);
+    sprintf(colonformat,"%02X:%02X:%02X:%02X:%02X:%02X",
+            macaddr_[0],macaddr_[1],macaddr_[2],macaddr_[3],macaddr_[4],macaddr_[5]);
+    // cout << colonformat << endl;
+    return colonformat;
 
 }
 
@@ -234,7 +234,7 @@ char *Address::convertHWAddrToColonFormat()
  */
 void Address::setHWAddr(unsigned char* hwaddr)
 {
-  memcpy(macaddr_, hwaddr , MAC_ADDR_LENGTH*sizeof(unsigned char));
+    memcpy(macaddr_, hwaddr , MAC_ADDR_LENGTH*sizeof(unsigned char));
 }
 
 /**
@@ -243,17 +243,17 @@ void Address::setHWAddr(unsigned char* hwaddr)
  */
 bool Address::isSameMACAddr( Address *addr)
 {
-  if ( memcmp(macaddr_, addr->getHWAddr(), MAC_ADDR_LENGTH*sizeof(unsigned char))  == 0 )
-           return true;
-  return false;
+    if ( memcmp(macaddr_, addr->getHWAddr(), MAC_ADDR_LENGTH*sizeof(unsigned char))  == 0 )
+        return true;
+    return false;
 
 }
 
 Address* Address::clone()
 {
-  Address * ad =  new Address(hostname_, port_);
-  ad->setHWAddr(macaddr_);
-  return ad;
+    Address * ad =  new Address(hostname_, port_);
+    ad->setHWAddr(macaddr_);
+    return ad;
 }
 
 //===============================================================
@@ -269,56 +269,56 @@ Port::Port():sockfd_(0)
 
 void Port::setAddress(Address* addr)
 {
-  setHostname(addr->getHostname());
-  setPort(addr->getPort());
+    setHostname(addr->getHostname());
+    setPort(addr->getPort());
 }
 
 void Port::setRemoteAddress(Address* daddr)
 {
-  setRemoteHostname(daddr->getHostname());
-  setRemotePort(daddr->getPort());
+    setRemoteHostname(daddr->getHostname());
+    setRemotePort(daddr->getPort());
 }
 
- /**
-  * Fill sockaddr_in 'address' structure with information taken from
-  * 'addr' and return it cast to a 'struct sockaddr'.
-  * It handles following situations:
-  * - if hostname is given as empty "", then INADDR_ANY is used in return
-  * - if an IP address is given, then address could be set directly
-  * - if a hostname is given, call gethostbyname() to find the ip address of the hostname from DNS
-  */
+/**
+ * Fill sockaddr_in 'address' structure with information taken from
+ * 'addr' and return it cast to a 'struct sockaddr'.
+ * It handles following situations:
+ * - if hostname is given as empty "", then INADDR_ANY is used in return
+ * - if an IP address is given, then address could be set directly
+ * - if a hostname is given, call gethostbyname() to find the ip address of the hostname from DNS
+ */
 struct sockaddr * Port::setSockAddress(Address *addr, struct sockaddr_in *address)
 {
-  char *hostname;
-  int port;
-  unsigned int tmp;
-  struct hostent *hp;
+    char *hostname;
+    int port;
+    unsigned int tmp;
+    struct hostent *hp;
 
-  hostname = addr->getHostname();
-  port = addr->getPort();
+    hostname = addr->getHostname();
+    port = addr->getPort();
 
-  address->sin_family = AF_INET;
-  address->sin_port   = htons((short)port);
-      
-  if (strcmp(hostname, "") == 0) {
-    address->sin_addr.s_addr = htonl(INADDR_ANY);  
-  } 
-  else {
-    //tmp = inet_addr(hostname);  // If an IP address is given
-    tmp = inet_aton(hostname, &(address->sin_addr));
-    //if(tmp != (unsigned long) INADDR_NONE){    
-    //  address->sin_addr.s_addr = tmp;  
-    //}
-    if (tmp == 0) 
-    {  // if a hostname is passed, call DNS
-      if ((hp = gethostbyname(hostname)) == NULL) {
-        herror("gethostbyname");
-	throw "Error in Resolving hostname!" ;                           
-      }
-      memcpy((char *)&address->sin_addr, (char *)hp->h_addr, hp->h_length);
+    address->sin_family = AF_INET;
+    address->sin_port   = htons((short)port);
+
+    if (strcmp(hostname, "") == 0) {
+        address->sin_addr.s_addr = htonl(INADDR_ANY);  
+    } 
+    else {
+        //tmp = inet_addr(hostname);  // If an IP address is given
+        tmp = inet_aton(hostname, &(address->sin_addr));
+        //if(tmp != (unsigned long) INADDR_NONE){    
+        //  address->sin_addr.s_addr = tmp;  
+        //}
+        if (tmp == 0) 
+        {  // if a hostname is passed, call DNS
+            if ((hp = gethostbyname(hostname)) == NULL) {
+                herror("gethostbyname");
+                throw "Error in Resolving hostname!" ;                           
+            }
+            memcpy((char *)&address->sin_addr, (char *)hp->h_addr, hp->h_length);
+        }
     }
-  }
-  return (sockaddr*)address;
+    return (sockaddr*)address;
 }
 
 /**
@@ -327,8 +327,8 @@ struct sockaddr * Port::setSockAddress(Address *addr, struct sockaddr_in *addres
  */
 void Port::decodeSockAddress(Address *addr, struct sockaddr_in *address)
 {
-  addr->setHostname(inet_ntoa(address->sin_addr));
-  addr->setPort(ntohs(address->sin_port));  
+    addr->setHostname(inet_ntoa(address->sin_addr));
+    addr->setPort(ntohs(address->sin_port));  
 }
 
 
@@ -339,17 +339,17 @@ void Port::decodeSockAddress(Address *addr, struct sockaddr_in *address)
 
 SendingPort::SendingPort(): Port(),bcastflag_(0),timer_(this)
 {
-  setHostname("localhost"); 
-  setPort(DEFAULT_SEND_PORT);  
-  // setRemoteHostname("internal2");  
+    setHostname("localhost"); 
+    setPort(DEFAULT_SEND_PORT);  
+    // setRemoteHostname("internal2");  
 }
 
 
 SendingPort::SendingPort(char *hostname, short port):Port(),bcastflag_(0),timer_(this)
 {
-  setHostname(hostname);
-  setPort(port);
-  //setRemotePort(DEFAULT_RECV_PORT); 
+    setHostname(hostname);
+    setPort(port);
+    //setRemotePort(DEFAULT_RECV_PORT); 
 }
 
 /** Init Funciton to initialize a socket port.
@@ -367,39 +367,39 @@ SendingPort::SendingPort(char *hostname, short port):Port(),bcastflag_(0),timer_
  */
 void SendingPort::init()
 {
-  //"0" shows the sockfd is uninitialized, -1 means error
-  if (sockfd_ != 0) {
-    cout << "socket has not been properly initialized!" << endl;
-    return;
-  }
-  if ( myaddr_.isSet() == false) {
-    setHostname("localhost");
-    setPort(DEFAULT_SEND_PORT);
-  }
-  //check if itsaddr_ is set
-/*  if ( itsaddr_.isSet() == false)
-    throw "Destination address of a sending port is not set!";
-*/
-  if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-    perror("socket");
-    throw "Error while opening a UDP socket";
-  }
-  Address *emptyAddr = new Address("", myaddr_.getPort());
-  struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
-  if (  bind(sockfd_, addr, sizeof(struct sockaddr_in))  < 0 ){
-    perror("bind");
-    throw "Scoket Bind Error";
-  }
-   
-  if (bcastflag_ == 1)
-    if (setsockopt(sockfd_,SOL_SOCKET,SO_BROADCAST,&bcastflag_,sizeof(bcastflag_)) == -1   )
-         {
-           perror("setsockopt");
-	   throw "Set broadcast option failed.";
-         }; 
-  //create sending buffer
-  sendingbuf_ = new char[MTU_SIZE+1];
-  return; 
+    //"0" shows the sockfd is uninitialized, -1 means error
+    if (sockfd_ != 0) {
+        cout << "socket has not been properly initialized!" << endl;
+        return;
+    }
+    if ( myaddr_.isSet() == false) {
+        setHostname("localhost");
+        setPort(DEFAULT_SEND_PORT);
+    }
+    //check if itsaddr_ is set
+    /*  if ( itsaddr_.isSet() == false)
+        throw "Destination address of a sending port is not set!";
+     */
+    if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        perror("socket");
+        throw "Error while opening a UDP socket";
+    }
+    Address *emptyAddr = new Address("", myaddr_.getPort());
+    struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
+    if (  bind(sockfd_, addr, sizeof(struct sockaddr_in))  < 0 ){
+        perror("bind");
+        throw "Scoket Bind Error";
+    }
+
+    if (bcastflag_ == 1)
+        if (setsockopt(sockfd_,SOL_SOCKET,SO_BROADCAST,&bcastflag_,sizeof(bcastflag_)) == -1   )
+        {
+            perror("setsockopt");
+            throw "Set broadcast option failed.";
+        }; 
+    //create sending buffer
+    sendingbuf_ = new char[MTU_SIZE+1];
+    return; 
 
 }
 
@@ -410,16 +410,16 @@ void SendingPort::init()
 
 void SendingPort::sendPacket(Packet* pkt)
 {  
-   int pktlen = pkt->makePacket(sendingbuf_); 
-   Address *dst = getRemoteAddr();
-   int  length = sizeof(struct sockaddr_in); 
-   struct sockaddr *dest = setSockAddress(dst, &dstSockAddress_);
-   int len = sendto(sockfd_, sendingbuf_, pktlen, 0, dest, length); 
-   if (len == -1) 
-   { 
-         perror("send");
-         throw "Sending Error.";
-   }
+    int pktlen = pkt->makePacket(sendingbuf_); 
+    Address *dst = getRemoteAddr();
+    int  length = sizeof(struct sockaddr_in); 
+    struct sockaddr *dest = setSockAddress(dst, &dstSockAddress_);
+    int len = sendto(sockfd_, sendingbuf_, pktlen, 0, dest, length); 
+    if (len == -1) 
+    { 
+        perror("send");
+        throw "Sending Error.";
+    }
 }
 
 //====================================================================
@@ -430,7 +430,7 @@ void SendingPort::sendPacket(Packet* pkt)
 
 ReceivingPort::ReceivingPort(): Port()
 {
-  pkt_= new Packet(MAXBUFLENGTH);
+    pkt_= new Packet(MAXBUFLENGTH);
 }
 
 /** Init Funciton to initialize a socket port.
@@ -449,25 +449,25 @@ ReceivingPort::ReceivingPort(): Port()
  */
 void ReceivingPort::init()
 { 
-  if (sockfd_ != 0) {
-    return;
-  }
-  if ( myaddr_.isSet() == false) {
-    setHostname("localhost");
-    setPort(DEFAULT_RECV_PORT);
-  }
-  
-  if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-    throw "Error while opening UDP socket of a receiver";
-  }
-  Address *emptyAddr = new Address("", myaddr_.getPort());
-  struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
-  if (  bind(sockfd_, addr, sizeof(struct sockaddr_in))  < 0 ){
-    throw "Scoket Bind Error occured in an UDP receiver";
-  }
-  //cout << "binding to port: " << myaddr_.getPort() << "......" << endl;
-  // needs a dummy buffer for storing packets
-  tmpBuffer_ =  new char[MAXBUFLENGTH];
+    if (sockfd_ != 0) {
+        return;
+    }
+    if ( myaddr_.isSet() == false) {
+        setHostname("localhost");
+        setPort(DEFAULT_RECV_PORT);
+    }
+
+    if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
+        throw "Error while opening UDP socket of a receiver";
+    }
+    Address *emptyAddr = new Address("", myaddr_.getPort());
+    struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
+    if (  bind(sockfd_, addr, sizeof(struct sockaddr_in))  < 0 ){
+        throw "Scoket Bind Error occured in an UDP receiver";
+    }
+    //cout << "binding to port: " << myaddr_.getPort() << "......" << endl;
+    // needs a dummy buffer for storing packets
+    tmpBuffer_ =  new char[MAXBUFLENGTH];
 }
 
 /** The main receive function of a receiving port.
@@ -485,21 +485,27 @@ void ReceivingPort::init()
 
 Packet* ReceivingPort::receivePacket()
 {
-  struct sockaddr_in tmpSockAddr;
-  int length = sizeof(struct sockaddr);
-  int len = (int)recvfrom(sockfd_, tmpBuffer_, MAXBUFLENGTH, 0, (struct sockaddr*)&tmpSockAddr,(socklen_t *)&length); 
-  if (len == -1) 
-  {
-           perror("recvfrom");
-           return NULL; //was earlier false
-  }         
-  decodeSockAddress( &itsaddr_, &tmpSockAddr);
-  pkt_->extractHeader(tmpBuffer_);
-  //tmpBuffer_ pointer shall not be moved/shifted,it will reused by the receiving port.
-  pkt_->fillPayload(len-1-pkt_->getHeaderSize(), tmpBuffer_+pkt_->getHeaderSize()+1 );
-  return pkt_;
+    struct sockaddr_in tmpSockAddr;
+    int length = sizeof(struct sockaddr);
+
+    int thId = (int)pthread_self();
+    cout<<"receiving from thread id: "<<thId<<" sockfd:  "<<sockfd_<<endl;
+
+    int len = (int)recvfrom(sockfd_, tmpBuffer_, MAXBUFLENGTH, 0, (struct sockaddr*)&tmpSockAddr,(socklen_t *)&length); 
+    cout<<"received from thread id: "<<thId<<" sockfd:  "<<sockfd_<<endl;
+
+    if (len == -1) 
+    {
+        perror("recvfrom");
+        return NULL; //was earlier false
+    }         
+    decodeSockAddress( &itsaddr_, &tmpSockAddr);
+    pkt_->extractHeader(tmpBuffer_);
+    //tmpBuffer_ pointer shall not be moved/shifted,it will reused by the receiving port.
+    pkt_->fillPayload(len-1-pkt_->getHeaderSize(), tmpBuffer_+pkt_->getHeaderSize()+1 );
+    return pkt_;
 }
- 
+
 //===================================================================
 //    LossyReceivingPort class
 /**
@@ -515,19 +521,19 @@ LossyReceivingPort::LossyReceivingPort(float lossyratio): ReceivingPort(), loss_
  */
 Packet* LossyReceivingPort::receivePacket()
 {   
-  Packet *p = ReceivingPort::receivePacket();
-  //simulate some delay
-  //sleep(secdelay_); //delay
-  usleep(1000*secdelay_);
-  float  x;
-  // Set evil seed (initial seed)
-  srand( (unsigned)time( NULL ) );
-  x = (double) rand()/RAND_MAX;
-  //cout << x << endl;
-  if ( x <= loss_ratio_) 
-    return NULL;
-  else
-    return p;
+    Packet *p = ReceivingPort::receivePacket();
+    //simulate some delay
+    //sleep(secdelay_); //delay
+    usleep(1000*secdelay_);
+    float  x;
+    // Set evil seed (initial seed)
+    srand( (unsigned)time( NULL ) );
+    x = (double) rand()/RAND_MAX;
+    //cout << x << endl;
+    if ( x <= loss_ratio_) 
+        return NULL;
+    else
+        return p;
 }
 
 
@@ -537,28 +543,28 @@ Packet* LossyReceivingPort::receivePacket()
 
 TxTimer::TxTimer(SendingPort *txport)
 {
-  port_ = txport;  
-  tdelay_.tv_nsec = 0;
-  tdelay_.tv_sec =  0; 
+    port_ = txport;  
+    tdelay_.tv_nsec = 0;
+    tdelay_.tv_sec =  0; 
 }
 
 void *TxTimer::timerProc(void *arg) {
-  TxTimer *th = (TxTimer *)arg;
-  nanosleep(&(th->tdelay_), NULL);
-  th->port_->timerHandler(); 
-  return NULL;
+    TxTimer *th = (TxTimer *)arg;
+    nanosleep(&(th->tdelay_), NULL);
+    th->port_->timerHandler(); 
+    return NULL;
 }
 
 void TxTimer::startTimer(float delay)
 {
-  tdelay_.tv_nsec = (long int)((delay - (int)delay)*1e9);
-  tdelay_.tv_sec =  (int)delay; 
-  int error = pthread_create(&tid_, NULL, &timerProc, this );
-  if (error) 
-    throw "Timer thread creation failed...";
-  
+    tdelay_.tv_nsec = (long int)((delay - (int)delay)*1e9);
+    tdelay_.tv_sec =  (int)delay; 
+    int error = pthread_create(&tid_, NULL, &timerProc, this );
+    if (error) 
+        throw "Timer thread creation failed...";
+
 }
 void TxTimer::stopTimer()
 {
-  pthread_cancel(tid_);
+    pthread_cancel(tid_);
 }

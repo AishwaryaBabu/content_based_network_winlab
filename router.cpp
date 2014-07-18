@@ -35,7 +35,7 @@ static const int sendingPortNum = 6300;
   Argument to be send to <NodeRecProc>(void *arg)
  */
 struct cShared{
-//    string receivingInterface;
+    //    string receivingInterface;
     LossyReceivingPort* fwdRecvPort;
     mySendingPort* fwdSendPort;
     int position;
@@ -76,7 +76,7 @@ void Display2DVector(vector<vector<int> > nameOfVector)
 
 /*!
   \brief Displays contents of Connections list
-*/
+ */
 void DisplayConnectionsList()
 {
     cout<<"Connections List: "<<endl;
@@ -123,7 +123,7 @@ void CreateConnectionsList(char* argv)
 
 /*!
   \brief Displays contents of Routing table
-*/
+ */
 void DisplayRoutingTable()
 {
     cout<<"Routing Table: "<<endl;
@@ -243,11 +243,11 @@ string getReceivingInterface(int requestedContentId)
             return routingTable[i].recInterface; //Returns receiving port number   
         }
     }
-//    return NULL;
+    //    return NULL;
     return ""; 
 
-//return NULL gave terminate called after throwing an instance of 'std::logic_error'
-//  what():  basic_string::_S_construct null not valid
+    //return NULL gave terminate called after throwing an instance of 'std::logic_error'
+    //  what():  basic_string::_S_construct null not valid
 
 }
 
@@ -281,7 +281,7 @@ bool contentIdExists(int requestedContentId)
 
 /*!
   \brief Displays contents of Pending Request table
-*/
+ */
 void DisplayPendingRequestTable()
 {
     cout<<"PRT Table: "<<endl;
@@ -322,7 +322,7 @@ void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, str
         pendingRequestTable.push_back(prtElem);
 
     }
-//    cout<<"Request recd - Pending Req Tab:"<<endl;
+    //    cout<<"Request recd - Pending Req Tab:"<<endl;
     //    Display2DVector(pendingRequestTable);
     cout<<"Request Received: "<<endl;
     DisplayPendingRequestTable();
@@ -431,6 +431,8 @@ void* NodeRecProc(void* arg)
     //Packet received : needs to be checked for appropriate forwarding and editing of table
     while(true)
     {
+        cout<<"At: "<<sh->receivingInterface<<" thread id: "<<(int)pthread_self()<<endl;
+
         recvPacket = sh->fwdRecvPort->receivePacket();
         if(recvPacket != NULL)
         {
@@ -440,7 +442,7 @@ void* NodeRecProc(void* arg)
             {
                 int requestedContentId = int(recvPacket->accessHeader()->getOctet(1));
                 int requestingHostId = int(recvPacket->accessHeader()->getOctet(2)); 
-//                string receivingInterface = sh->receivingInterface;
+                //                string receivingInterface = sh->receivingInterface;
                 int position = sh->position;
                 string receivingInterface = connectionsList[position][0];
 
@@ -480,7 +482,7 @@ void* NodeRecProc(void* arg)
             else if(recvPacket->accessHeader()->getOctet(0) == '2')
             {
                 int receivedContentId = int(recvPacket->accessHeader()->getOctet(1));
-//                string receivingInterface = sh->receivingInterface;
+                //                string receivingInterface = sh->receivingInterface;
                 int position = sh->position;
                 string receivingInterface = connectionsList[position][0];
 
@@ -576,11 +578,11 @@ void StartNodeThread(pthread_t* thread, int position)
 
     //pthread_create() - with sender
     struct cShared *sh;
-//    sh = (struct cShared*)malloc(sizeof(struct cShared));
+    //    sh = (struct cShared*)malloc(sizeof(struct cShared));
     sh = new struct cShared;
     sh->fwdRecvPort = recvPort;
     sh->fwdSendPort = sendPort;
-//    sh->receivingInterface = hostnames[0]; //Change to new instead of malloc
+    //    sh->receivingInterface = hostnames[0]; //Change to new instead of malloc
     sh->position = position;
     //    sh->max = n;
     //    pthread_t thread;

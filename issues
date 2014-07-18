@@ -1,2 +1,11 @@
+gdb --args ./router.cpp connectionsList ----> tells gdb to run the program with the defined arguments 
+
+(gdb) break router.cpp:544 ----> inserts break point at line 544 
+(gdb) n ----> to go to next line 
+
+
 -host: Receiving request to self .. not going across interface 
+
+
+
 -router: glibc memory allocation for thread creation
