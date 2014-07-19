@@ -460,6 +460,7 @@ void ReceivingPort::init()
     if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         throw "Error while opening UDP socket of a receiver";
     }
+//    Address *emptyAddr = new Address(myaddr_.getHostname(), myaddr_.getPort());
     Address *emptyAddr = new Address("", myaddr_.getPort());
     struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
     if (  bind(sockfd_, addr, sizeof(struct sockaddr_in))  < 0 ){

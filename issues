@@ -9,3 +9,6 @@ gdb --args ./router.cpp connectionsList ----> tells gdb to run the program with 
 -router: glibc memory allocation for thread creation
 
 -common.cpp : 463 ----> check the emptyAddr
+-change emptyAddr : "" to myaddr_.getHostname()
+this makes the socket bind to a specific ip and not INADDR_ANY 
+Now the bind looks only for messages addressed to the specific IP and does not acknowledge a broadcasted message either: Use of INADDR_ANY and SO_BINDTODEVICE is a suggested solution
