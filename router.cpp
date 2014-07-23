@@ -567,7 +567,7 @@ void StartNodeThread(pthread_t* thread, int position)
         recvPort = new LossyReceivingPort(lossPercent);
         recvPort->setAddress(recvAddr);
         recvPort->setBindtoDevice();
-//Set the hostname
+
         sendPort = new mySendingPort();
         sendPort->setAddress(sendAddr);
         sendPort->setBroadcast();  //ADD THIS

@@ -220,7 +220,7 @@ struct hostnames SetupAddress(char *argv)
     inputFile.open(connectionsFilename.c_str(), fstream::in);
     int i = 1;
 
-    while(inputFile >> temp1 >> temp2)
+    while(inputFile >> temp >> temp1 >> temp2)
     {
         if(i > 2)
         {

@@ -272,6 +272,7 @@ void Port::setAddress(Address* addr)
 {
     setHostname(addr->getHostname());
     setPort(addr->getPort());
+    setInterfaceName(addr->getInterfaceName());
 }
 
 void Port::setRemoteAddress(Address* daddr)
@@ -501,7 +502,7 @@ Packet* ReceivingPort::receivePacket()
     struct sockaddr_in tmpSockAddr;
     int length = sizeof(struct sockaddr);
 
-    int thId = (int)pthread_self();
+    long thId = (long)pthread_self();
     cout<<"receiving from thread id: "<<thId<<" sockfd:  "<<sockfd_<<endl;
 
     int len = (int)recvfrom(sockfd_, tmpBuffer_, MAXBUFLENGTH, 0, (struct sockaddr*)&tmpSockAddr,(socklen_t *)&length); 

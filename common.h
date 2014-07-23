@@ -250,6 +250,8 @@ class Port
   struct sockaddr* setSockAddress(Address *addr, struct sockaddr_in *address);
   /// cast a socket address to normal address format
   void decodeSockAddress ( Address *addr, struct sockaddr_in *address);
+  /// set interface name of local address
+  inline void setInterfaceName(const char* ifname){ myaddr_.setInterfaceName(ifname);}
   /// set hostname of local address
   inline void setHostname(const char* hostname){ myaddr_.setHostname(hostname);}
   /// set port of local address
