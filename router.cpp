@@ -559,12 +559,15 @@ void StartNodeThread(pthread_t* thread, int position)
 
     try{
         recvAddr = new Address(connectionsList[position][0].c_str(), receivingPortNum+position);  //CHANGE "localhost" to second argument and ports[0] to 6200
+        recvAddr->setInterfaceName(connectionsList[position][2].c_str());
         sendAddr = new Address(connectionsList[position][0].c_str(), sendingPortNum+position);  //CHANGE "localhost" to second argument and ports[2] to 6300
+        recvAddr->setInterfaceName(connectionsList[position][2].c_str());
         //        dstAddr =  new Address("localhost", ports[2]); //NEEDS TO GO and edit common.cpp line 380 to get rid of assertion
 
         recvPort = new LossyReceivingPort(lossPercent);
         recvPort->setAddress(recvAddr);
-
+        recvPort->setBindtoDevice();
+//Set the hostname
         sendPort = new mySendingPort();
         sendPort->setAddress(sendAddr);
         sendPort->setBroadcast();  //ADD THIS

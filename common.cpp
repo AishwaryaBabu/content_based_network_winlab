@@ -149,6 +149,7 @@ Address::Address():port_(-1)
 {   
     hostname_[0] = '\0';  
     macaddr_[0] = '\0';
+    ifname_[0] = '\0';
 }
 
 Address::Address(const char* hostname, short port)
@@ -467,6 +468,17 @@ void ReceivingPort::init()
         throw "Scoket Bind Error occured in an UDP receiver";
     }
     //cout << "binding to port: " << myaddr_.getPort() << "......" << endl;
+
+    if (bindToDeviceFlag_ == 1)
+    {
+        char * ifname;
+        ifname = myaddr_.getInterfaceName();
+        if (setsockopt(sockfd_,SOL_SOCKET,SO_BINDTODEVICE, (char *)ifname,sizeof(ifname)) < 0  )
+        {
+            perror("setsockopt");
+            throw "Set bind to device option failed.";
+        }; 
+    }
     // needs a dummy buffer for storing packets
     tmpBuffer_ =  new char[MAXBUFLENGTH];
 }

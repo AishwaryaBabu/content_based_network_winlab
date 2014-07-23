@@ -177,6 +177,16 @@ class Address
     if (hostname == NULL) hostname_[0] = '\0'; else strcpy(hostname_, hostname); }
   /// get the hostname string pointer
   inline char* getHostname() {return hostname_;} 
+
+  /// set the interface name
+  /** use strcpy function to duplicate a string
+   *
+   */
+  inline void setInterfaceName(const char* ifname) { 
+    if (ifname == NULL) ifname_[0] = '\0'; else strcpy(ifname_, ifname); }
+  /// get the hostname string pointer
+  inline char* getInterfaceName() {return ifname_;} 
+
   /// get the MAC address
   inline   unsigned char* getHWAddr() { return  macaddr_;} 
   void setHWAddr( unsigned char* hwaddr); 
@@ -197,6 +207,7 @@ class Address
 
 protected:
   char   hostname_[MAX_HOSTNAME_LENGTH]; ///< both hostname and ipaddress format (10.0.0.1) could be given as a string
+  char ifname_[MAX_HOSTNAME_LENGTH]; ///< name of interface (eth0)
   short port_;  ///< port number for UDP or TCP (Transport layer)
   char * ipaddr_;  ///<optional use... ignore.... 
   unsigned char   macaddr_[MAC_ADDR_LENGTH]; ///< optional use for Ethernet Socket
@@ -378,13 +389,22 @@ class ReceivingPort : public Port
   void init();
   ///The main receive function of receiving port to receive a single packet.
   Packet* receivePacket(); 
-  
+  /**
+   * toggle broadcast option on
+   */
+  inline void setBindtoDevice(){bindToDeviceFlag_ = 1;}
+  /**
+   * toggle broadcast option off
+   */
+  inline void setBindToDeviceOff(){bindToDeviceFlag_ = 0;}
+ 
  protected:
    /**  This pointer points to the packet.
     *   This packet is just received.
     */
    Packet *pkt_;   
    char *tmpBuffer_;  ///<temporary buffer for packets
+   int bindToDeviceFlag_;
 };
 
 ///A receiving port simulating link loss and delay
