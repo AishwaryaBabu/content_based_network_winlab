@@ -34,6 +34,7 @@ struct hostnames
 {
     string hostname_self;
     string hostname_bcast;
+    string if_name;
 };
 
 struct adv
@@ -224,6 +225,7 @@ struct hostnames SetupAddress(char *argv)
         {
             Hname.hostname_self = string(temp1);
             Hname.hostname_bcast = string(temp2);
+            Hname.if_name = string(temp);
         }
         i++;
     }

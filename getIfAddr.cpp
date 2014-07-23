@@ -53,9 +53,12 @@ int main(int argc, char *argv[])
                 char ipBroadAddress[INET_ADDRSTRLEN];
                 inet_ntop(AF_INET, &(ip4addr->sin_addr), ipAddress, INET_ADDRSTRLEN);
                 inet_ntop(AF_INET, &(ip4Broadaddr->sin_addr), ipBroadAddress, INET_ADDRSTRLEN);
+
+                char *ifName = ifa->ifa_name;
+//                cout<<"interface name : "<<ifName<<endl;
 //              cout<<"broadcast address: "<<ipAddressStr<<endl;
 //                (if((ifName != "lo") && (ifName != "eth0")))
-                connectionsFile<<ipAddress<<" "<<ipBroadAddress<<endl;
+                connectionsFile<<ifName<<" "<<ipAddress<<" "<<ipBroadAddress<<endl;
 //              connectionsFile<<ifName<<" "<<afFamily<<" "<<ipAddress<<endl;
                 }
         }

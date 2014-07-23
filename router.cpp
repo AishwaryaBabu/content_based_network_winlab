@@ -100,19 +100,21 @@ void CreateConnectionsList(char* argv)
     string connectionsFilename(argv); 
     //    vector<string> inputDataLines;
     fstream inputFile;
+    char temp[maxLineLength];
     char temp1[maxLineLength];
     char temp2[maxLineLength];
 
     int i = 1;
     inputFile.open(connectionsFilename.c_str(), fstream::in);
 
-    while(inputFile >> temp1 >> temp2)
+    while(inputFile >> temp >> temp1 >> temp2)
     {
         if(i > 2)
         {
             vector<string> listElement;
             listElement.push_back(string(temp1));
             listElement.push_back(string(temp2));
+            listElement.push_back(string(temp));
             connectionsList.push_back(listElement);
         }
         i++;
