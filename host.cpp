@@ -259,8 +259,15 @@ int main(int argc, char * argv[])
     cout<<"hostnames: "<<Hname.hostname_self<<" "<<Hname.hostname_bcast<<endl;
 
     try{
+/*
         my_req_addr = new Address(Hname.hostname_self.c_str(), sendingPortNum);
         my_res_addr = new Address(Hname.hostname_self.c_str(), receivingPortNum);
+        my_res_addr->setInterfaceName(Hname.if_name.c_str());
+        my_adv_addr = new Address(Hname.hostname_self.c_str(), advPortNum);
+        router_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum);  
+*/
+        my_req_addr = new Address(Hname.hostname_self.c_str(), sendingPortNum);
+        my_res_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum);
         my_res_addr->setInterfaceName(Hname.if_name.c_str());
         my_adv_addr = new Address(Hname.hostname_self.c_str(), advPortNum);
         router_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum);  

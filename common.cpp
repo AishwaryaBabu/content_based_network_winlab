@@ -386,7 +386,8 @@ void SendingPort::init()
         perror("socket");
         throw "Error while opening a UDP socket";
     }
-    Address *emptyAddr = new Address("", myaddr_.getPort());
+//    Address *emptyAddr = new Address("", myaddr_.getPort());
+    Address *emptyAddr = new Address(myaddr_.getHostname(), myaddr_.getPort());
     struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
     if (  bind(sockfd_, addr, sizeof(struct sockaddr_in))  < 0 ){
         perror("bind");
@@ -462,8 +463,8 @@ void ReceivingPort::init()
     if ((sockfd_ = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
         throw "Error while opening UDP socket of a receiver";
     }
-//    Address *emptyAddr = new Address(myaddr_.getHostname(), myaddr_.getPort());
-    Address *emptyAddr = new Address("", myaddr_.getPort());
+    Address *emptyAddr = new Address(myaddr_.getHostname(), myaddr_.getPort());
+//    Address *emptyAddr = new Address("", myaddr_.getPort());
     struct sockaddr* addr = setSockAddress(emptyAddr, &mySockAddress_);
     if (  bind(sockfd_, addr, sizeof(struct sockaddr_in))  < 0 ){
         throw "Scoket Bind Error occured in an UDP receiver";
@@ -502,11 +503,11 @@ Packet* ReceivingPort::receivePacket()
     struct sockaddr_in tmpSockAddr;
     int length = sizeof(struct sockaddr);
 
-    long thId = (long)pthread_self();
-    cout<<"receiving from thread id: "<<thId<<" sockfd:  "<<sockfd_<<endl;
+//    long thId = (long)pthread_self();
+//    cout<<"receiving from thread id: "<<thId<<" sockfd:  "<<sockfd_<<endl;
 
     int len = (int)recvfrom(sockfd_, tmpBuffer_, MAXBUFLENGTH, 0, (struct sockaddr*)&tmpSockAddr,(socklen_t *)&length); 
-    cout<<"received from thread id: "<<thId<<" sockfd:  "<<sockfd_<<endl;
+//    cout<<"received from thread id: "<<thId<<" sockfd:  "<<sockfd_<<endl;
 
     if (len == -1) 
     {

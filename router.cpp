@@ -446,7 +446,7 @@ void* NodeRecProc(void* arg)
                 int requestingHostId = int(recvPacket->accessHeader()->getOctet(2)); 
                 //                string receivingInterface = sh->receivingInterface;
                 int position = sh->position;
-                string receivingInterface = connectionsList[position][0];
+                string receivingInterface = connectionsList[position][1];
 
 
                 //Look up routing table based on content id and Forward to appropriate next hop
@@ -486,7 +486,7 @@ void* NodeRecProc(void* arg)
                 int receivedContentId = int(recvPacket->accessHeader()->getOctet(1));
                 //                string receivingInterface = sh->receivingInterface;
                 int position = sh->position;
-                string receivingInterface = connectionsList[position][0];
+                string receivingInterface = connectionsList[position][1];
 
                 int numHops = int(recvPacket->accessHeader()->getOctet(2));
 
@@ -558,10 +558,10 @@ void StartNodeThread(pthread_t* thread, int position)
     LossyReceivingPort* recvPort; //receiving port corr to recvAddr;
 
     try{
-        recvAddr = new Address(connectionsList[position][0].c_str(), receivingPortNum+position);  //CHANGE "localhost" to second argument and ports[0] to 6200
+        recvAddr = new Address(connectionsList[position][1].c_str(), receivingPortNum);  //CHANGE "localhost" to second argument and ports[0] to 6200
         recvAddr->setInterfaceName(connectionsList[position][2].c_str());
-        sendAddr = new Address(connectionsList[position][0].c_str(), sendingPortNum+position);  //CHANGE "localhost" to second argument and ports[2] to 6300
-        recvAddr->setInterfaceName(connectionsList[position][2].c_str());
+        sendAddr = new Address(connectionsList[position][0].c_str(), sendingPortNum);  //CHANGE "localhost" to second argument and ports[2] to 6300
+        sendAddr->setInterfaceName(connectionsList[position][2].c_str());
         //        dstAddr =  new Address("localhost", ports[2]); //NEEDS TO GO and edit common.cpp line 380 to get rid of assertion
 
         recvPort = new LossyReceivingPort(lossPercent);
