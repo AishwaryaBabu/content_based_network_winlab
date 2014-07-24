@@ -109,7 +109,7 @@ void CreateConnectionsList(char* argv)
 
     while(inputFile >> temp >> temp1 >> temp2)
     {
-        if(i > 2)
+        if(i > 3)
         {
             vector<string> listElement;
             listElement.push_back(string(temp1));

@@ -99,7 +99,7 @@ void *advertisement(void *args)
 void *receivedata(void *args)
 {
     /*REQ Packet - Type 0
-      RES Packet - Type 1
+      RES Packet - Type 1   - to be implemented in client
       ADV Packet - Type 2*/
 
     struct res *sh2 = (struct res *)args;
@@ -194,14 +194,6 @@ void *receivedata(void *args)
                 }
             }
 
-            /*            else if (type == '2')
-                          {
-                          char a = q->accessHeader()->getOctet(0);
-                          int b = (int)q->accessHeader()->getOctet(1);
-                          char c = q->accessHeader() ->getOctet(2);
-                          cout << "This packet is of type "<<a<<" with content ID "<<b<< " with "<<c<< " hops to it"<<endl;
-                          }
-             */
         } //Closes if
     }//Closes while
     return NULL;
@@ -222,7 +214,7 @@ struct hostnames SetupAddress(char *argv)
 
     while(inputFile >> temp >> temp1 >> temp2)
     {
-        if(i > 2)
+        if(i > 3)
         {
             Hname.hostname_self = string(temp1);
             Hname.hostname_bcast = string(temp2);
@@ -259,15 +251,9 @@ int main(int argc, char * argv[])
     cout<<"hostnames: "<<Hname.hostname_self<<" "<<Hname.hostname_bcast<<endl;
 
     try{
-/*
+
         my_req_addr = new Address(Hname.hostname_self.c_str(), sendingPortNum);
-        my_res_addr = new Address(Hname.hostname_self.c_str(), receivingPortNum);
-        my_res_addr->setInterfaceName(Hname.if_name.c_str());
-        my_adv_addr = new Address(Hname.hostname_self.c_str(), advPortNum);
-        router_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum);  
-*/
-        my_req_addr = new Address(Hname.hostname_self.c_str(), sendingPortNum);
-        my_res_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum);
+        my_res_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum); //Earlier was _self
         my_res_addr->setInterfaceName(Hname.if_name.c_str());
         my_adv_addr = new Address(Hname.hostname_self.c_str(), advPortNum);
         router_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum);  
@@ -305,7 +291,6 @@ int main(int argc, char * argv[])
     sh = (struct adv*)malloc(sizeof(struct adv));
     sh->my_adv_port = my_adv_port;
 
-
     //creating thread to advertise
 
     pthread_create(&(thread), 0,&advertisement,sh);
@@ -320,7 +305,6 @@ int main(int argc, char * argv[])
 
     while(1)
     {
-
         string input;
         string input2;
         //int hdrSize = 256;
@@ -330,8 +314,7 @@ int main(int argc, char * argv[])
 
         if(input.compare("add")==0)
         {
-            //string src_path = "/home/tua96426/Desktop/";
-            //string dest_path = "/home/tua96426/Desktop/src/";
+//NEEDS GENERALIZING
             string src_path = "../";
             string path = "cp " + src_path + input2 + " " + input2;
             const char* content_add = path.c_str();

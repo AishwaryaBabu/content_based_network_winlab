@@ -15,3 +15,8 @@ Now the bind looks only for messages addressed to the specific IP and does not a
 
 
 Receiving port numbers incremented by "position" cause major issue of not receiving from one direction
+
+broadcast works but without INADDR_ANY and uses broadcast ip but not interface's specific IP
+
+host.cpp:326 needs generalizing 
+Hostname as part of the packet or router needs to keep entry of the incoming interface as part of the pending request table to avoid double forwarding of messages
