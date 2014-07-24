@@ -396,7 +396,8 @@ string SearchPendingRequestTable(int contentId, int hostId)
         if(contentId==pendingRequestTable[i].requestedContentId && hostId==pendingRequestTable[i].requestingHostId)
             return pendingRequestTable[i].recInterface;
     }
-    return NULL;
+//    return NULL;
+    return "";
 }
 
 /*!
