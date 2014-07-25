@@ -27,7 +27,11 @@ struct hostnames
     string hostname_bcast;
     string if_name;
 };
-
+struct res
+{
+    LossyReceivingPort *my_res_port;
+    mySendingPort *my_req_port;
+};
 int host_id = 1; //Host ID for 
 
 
@@ -38,9 +42,9 @@ void *receivedata(void *args)
       ADV Packet - Type 2*/
 
     struct res *sh2 = (struct res *)args;
-    FILE *data;
+//    FILE *data;
     Packet *q;
-    short size;
+//    short size;
     while(1)
     {
 
@@ -90,7 +94,14 @@ struct hostnames SetupAddress(char *argv)
 
     while(inputFile >> temp >> temp1 >> temp2)
     {
-        if(i > 2)
+        if(i == 1)
+        {
+            string self(temp);
+            host_id = atoi(self.substr(1).c_str());
+            cout<<"Selfid is: "<<host_id<<endl;
+
+        }
+        if(i > 3)
         {
             Hname.hostname_self = string(temp1);
             Hname.hostname_bcast = string(temp2);
@@ -106,18 +117,16 @@ struct hostnames SetupAddress(char *argv)
 
 int main(int argc, char * argv[])
 {
-    cout<<"I am "<<argv[1]<<endl;
+//    cout<<"I am "<<argv[1]<<endl;
 
-    pthread_t thread; //for advertising
+//    pthread_t thread; //for advertising
     pthread_t thread2; //for receiving all information
 
     //create advertising sending port with the destination port included. Then we will asend it to the thread.
-    Address *my_adv_addr; //We advertise from here
     Address *my_res_addr; //We receive information from here
     Address *my_req_addr; //We request content from here
     Address *router_addr; //We address the router from here
     mySendingPort *my_req_port; //Requesting port; note the change in type (2 vs no 2)
-    mySendingPort2 *my_adv_port;//Sending port for advertisements
     LossyReceivingPort *my_res_port; //Receiving port information
 
     struct hostnames Hname; 
@@ -130,7 +139,6 @@ int main(int argc, char * argv[])
         my_req_addr = new Address(Hname.hostname_self.c_str(), sendingPortNum);
         my_res_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum); //Earlier was _self
         my_res_addr->setInterfaceName(Hname.if_name.c_str());
-        my_adv_addr = new Address(Hname.hostname_self.c_str(), advPortNum);
         router_addr = new Address(Hname.hostname_bcast.c_str(), receivingPortNum);  
 
         //Initialize requesting port (sending)
@@ -140,14 +148,6 @@ int main(int argc, char * argv[])
 //        my_req_port->setRemoteAddress(my_res_addr);
         my_req_port->setBroadcast();
         my_req_port->init();                               
-
-        //Initialize advertising port (sending)
-        my_adv_port = new mySendingPort2();
-        my_adv_port->setAddress(my_adv_addr);
-        my_adv_port->setRemoteAddress(router_addr);
-//        my_adv_port->setRemoteAddress(my_res_addr); //Shouldnt matter that it is the same as the receiving address since the we broadcast
-        my_adv_port->setBroadcast();
-        my_adv_port->init();
 
         //Initialize receiving port (receiving)
         my_res_port = new LossyReceivingPort(lossPercent);
@@ -161,14 +161,6 @@ int main(int argc, char * argv[])
         cerr << "Exception:" << reason << endl;
         exit(-1);
     }
-
-    struct adv *sh;
-    sh = (struct adv*)malloc(sizeof(struct adv));
-    sh->my_adv_port = my_adv_port;
-
-    //creating thread to advertise
-
-    pthread_create(&(thread), 0,&advertisement,sh);
 
     struct res *sh2;
     sh2 = (struct res*)malloc(sizeof(struct res));
@@ -186,46 +178,6 @@ int main(int argc, char * argv[])
         //get user input on
         cout << "Prompt> ";
         cin >> input >> input2;      
-
-        if(input.compare("add")==0)
-        {
-//NEEDS GENERALIZING
-            string src_path = "../";
-            string path = "cp " + src_path + input2 + " " + input2;
-            const char* content_add = path.c_str();
-            system(content_add); //Makes a system call to physically copy file from parent directory to child directory
-
-            //Code checks to see if the file actually exists; else no reason to add to the content table.
-            FILE *pfile;
-            pfile = fopen(input2.c_str(),"r");
-            if (pfile == NULL)
-            {
-                continue;
-            }
-
-            else
-            {
-                fclose(pfile); //need to close the open file!
-                int input2_int = atoi(input2.c_str());
-
-                //Add value to content table if its unique.
-
-                if(std::find(content.begin(),content.end(),input2_int) == content.end())
-                {
-                    content.push_back(input2_int);
-                }
-
-                cout << "This host has "<< content.size() <<" content(s) in its library" <<endl;
-
-                for(unsigned int n=0;n<content.size();n++)
-                {
-                    cout<<content[n]<<", ";
-                }
-
-                printf("\n");
-            } //closes else
-
-        } //closes if compare
 
         if(input.compare("get")==0)
         {
@@ -278,40 +230,11 @@ int main(int argc, char * argv[])
             }
         }
 
-        if(input.compare("delete")==0)
-        {
-            string path_r = "rm " + input2;
-            const char* content_remove = path_r.c_str();
-            system(content_remove);
-
-            for( std::vector<int>::iterator iter = content.begin(); iter !=content.end();++iter)
-            {
-
-                if(*iter == atoi(input2.c_str()))
-                {
-                    content.erase(iter);
-                    cout<< "Content "<<input2<<" deleted"<<endl;
-                    break;
-                }
-            }
-
-            for(unsigned int n=0;n<content.size();n++)
-            {
-                cout<<content[n]<<" ";
-            }
-
-            printf("\n");
-
-
-        }
-
         if(input.compare("exit")==0)
         {
             cout <<"shutting down host" <<endl;
             return 0;
         }
-
-
     } //while close
 
 

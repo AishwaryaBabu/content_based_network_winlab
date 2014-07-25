@@ -2,6 +2,5 @@
 
 #obtain args from labWiki Experiment
 sudo make
-
-sudo ./client $args
-
+sudo ./getIfAddr
+sudo ./client connectionsList

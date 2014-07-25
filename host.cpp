@@ -214,6 +214,8 @@ struct hostnames SetupAddress(char *argv)
 
     while(inputFile >> temp >> temp1 >> temp2)
     {
+        if(i==1)
+            cout<<"Hostname: "<<temp<<endl;
         if(i > 3)
         {
             Hname.hostname_self = string(temp1);
@@ -225,13 +227,12 @@ struct hostnames SetupAddress(char *argv)
 
     inputFile.close();
 
-    return Hname;
-    
+    return Hname;   
 }
 
 int main(int argc, char * argv[])
 {
-    cout<<"I am "<<argv[1]<<endl;
+//    cout<<"I am "<<argv[1]<<endl;
 
     pthread_t thread; //for advertising
     pthread_t thread2; //for receiving all information
