@@ -212,17 +212,20 @@ struct hostnames SetupAddress(char *argv)
     inputFile.open(connectionsFilename.c_str(), fstream::in);
     int i = 1;
 
+    string self;
+    getline(inputFile, self);
+    host_id = atoi(self.substr(1).c_str());
+    cout<<"Selfid is: "<<host_id<<endl;
+
     while(inputFile >> temp >> temp1 >> temp2)
     {
-        if(i==1)
-            cout<<"Hostname: "<<temp<<endl;
+        i++;
         if(i > 3)
         {
             Hname.hostname_self = string(temp1);
             Hname.hostname_bcast = string(temp2);
             Hname.if_name = string(temp);
         }
-        i++;
     }
 
     inputFile.close();

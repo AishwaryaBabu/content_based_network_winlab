@@ -106,9 +106,13 @@ void CreateConnectionsList(char* argv)
 
     int i = 1;
     inputFile.open(connectionsFilename.c_str(), fstream::in);
+    
+    string self;
+    getline(inputFile, self);
 
     while(inputFile >> temp >> temp1 >> temp2)
     {
+        i++;
         if(i > 3)
         {
             vector<string> listElement;
@@ -117,7 +121,6 @@ void CreateConnectionsList(char* argv)
             listElement.push_back(string(temp));
             connectionsList.push_back(listElement);
         }
-        i++;
     }
 
     inputFile.close();

@@ -42,9 +42,9 @@ void *receivedata(void *args)
       ADV Packet - Type 2*/
 
     struct res *sh2 = (struct res *)args;
-//    FILE *data;
+    //    FILE *data;
     Packet *q;
-//    short size;
+    //    short size;
     while(1)
     {
 
@@ -88,19 +88,19 @@ struct hostnames SetupAddress(char *argv)
     char temp1[maxLineLength];
     char temp2[maxLineLength];
     struct hostnames Hname;
-    
+
     inputFile.open(connectionsFilename.c_str(), fstream::in);
     int i = 1;
 
+
+    string self;
+    getline(inputFile, self);
+    host_id = atoi(self.substr(1).c_str());
+    cout<<"Selfid is: "<<host_id<<endl;
+
     while(inputFile >> temp >> temp1 >> temp2)
     {
-        if(i == 1)
-        {
-            string self(temp);
-            host_id = atoi(self.substr(1).c_str());
-            cout<<"Selfid is: "<<host_id<<endl;
-
-        }
+        i++;
         if(i > 3)
         {
             Hname.hostname_self = string(temp1);
@@ -117,9 +117,9 @@ struct hostnames SetupAddress(char *argv)
 
 int main(int argc, char * argv[])
 {
-//    cout<<"I am "<<argv[1]<<endl;
+    //    cout<<"I am "<<argv[1]<<endl;
 
-//    pthread_t thread; //for advertising
+    //    pthread_t thread; //for advertising
     pthread_t thread2; //for receiving all information
 
     //create advertising sending port with the destination port included. Then we will asend it to the thread.
@@ -145,7 +145,7 @@ int main(int argc, char * argv[])
         my_req_port = new mySendingPort();
         my_req_port->setAddress(my_req_addr);
         my_req_port->setRemoteAddress(router_addr);
-//        my_req_port->setRemoteAddress(my_res_addr);
+        //        my_req_port->setRemoteAddress(my_res_addr);
         my_req_port->setBroadcast();
         my_req_port->init();                               
 
