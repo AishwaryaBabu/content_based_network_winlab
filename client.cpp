@@ -47,7 +47,6 @@ void *receivedata(void *args)
     //    short size;
     while(1)
     {
-
         q = sh2->my_res_port->receivePacket();
 
         if (q!= NULL)

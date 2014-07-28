@@ -208,7 +208,7 @@ struct hostnames SetupAddress(char *argv)
     char temp1[maxLineLength];
     char temp2[maxLineLength];
     struct hostnames Hname;
-    
+
     inputFile.open(connectionsFilename.c_str(), fstream::in);
     int i = 1;
 
@@ -233,9 +233,49 @@ struct hostnames SetupAddress(char *argv)
     return Hname;   
 }
 
+void AddContent(string contentId)
+{
+    //NEEDS GENERALIZING
+    string src_path = "../";
+    string path = "cp " + src_path + contentId + " " + contentId;
+    const char* content_add = path.c_str();
+    system(content_add); //Makes a system call to physically copy file from parent directory to child directory
+
+    //Code checks to see if the file actually exists; else no reason to add to the content table.
+    FILE *pfile;
+    pfile = fopen(contentId.c_str(),"r");
+    if (pfile == NULL)
+    {
+        return;
+    }
+
+    else
+    {
+        fclose(pfile); //need to close the open file!
+        int contentId_int = atoi(contentId.c_str());
+
+        //Add value to content table if its unique.
+
+        if(std::find(content.begin(),content.end(),contentId_int) == content.end())
+        {
+            content.push_back(contentId_int);
+        }
+
+        cout << "This host has "<< content.size() <<" content(s) in its library" <<endl;
+
+        for(unsigned int n=0;n<content.size();n++)
+        {
+            cout<<content[n]<<", ";
+        }
+
+        printf("\n");
+    } //closes else
+
+}
+
 int main(int argc, char * argv[])
 {
-//    cout<<"I am "<<argv[1]<<endl;
+    //    cout<<"I am "<<argv[1]<<endl;
 
     pthread_t thread; //for advertising
     pthread_t thread2; //for receiving all information
@@ -266,7 +306,7 @@ int main(int argc, char * argv[])
         my_req_port = new mySendingPort();
         my_req_port->setAddress(my_req_addr);
         my_req_port->setRemoteAddress(router_addr);
-//        my_req_port->setRemoteAddress(my_res_addr);
+        //        my_req_port->setRemoteAddress(my_res_addr);
         my_req_port->setBroadcast();
         my_req_port->init();                               
 
@@ -274,7 +314,7 @@ int main(int argc, char * argv[])
         my_adv_port = new mySendingPort2();
         my_adv_port->setAddress(my_adv_addr);
         my_adv_port->setRemoteAddress(router_addr);
-//        my_adv_port->setRemoteAddress(my_res_addr); //Shouldnt matter that it is the same as the receiving address since the we broadcast
+        //        my_adv_port->setRemoteAddress(my_res_addr); //Shouldnt matter that it is the same as the receiving address since the we broadcast
         my_adv_port->setBroadcast();
         my_adv_port->init();
 
@@ -318,42 +358,7 @@ int main(int argc, char * argv[])
 
         if(input.compare("add")==0)
         {
-//NEEDS GENERALIZING
-            string src_path = "../";
-            string path = "cp " + src_path + input2 + " " + input2;
-            const char* content_add = path.c_str();
-            system(content_add); //Makes a system call to physically copy file from parent directory to child directory
-
-            //Code checks to see if the file actually exists; else no reason to add to the content table.
-            FILE *pfile;
-            pfile = fopen(input2.c_str(),"r");
-            if (pfile == NULL)
-            {
-                continue;
-            }
-
-            else
-            {
-                fclose(pfile); //need to close the open file!
-                int input2_int = atoi(input2.c_str());
-
-                //Add value to content table if its unique.
-
-                if(std::find(content.begin(),content.end(),input2_int) == content.end())
-                {
-                    content.push_back(input2_int);
-                }
-
-                cout << "This host has "<< content.size() <<" content(s) in its library" <<endl;
-
-                for(unsigned int n=0;n<content.size();n++)
-                {
-                    cout<<content[n]<<", ";
-                }
-
-                printf("\n");
-            } //closes else
-
+        AddContent(input2);
         } //closes if compare
 
         if(input.compare("get")==0)
