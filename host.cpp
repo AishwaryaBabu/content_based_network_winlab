@@ -55,7 +55,6 @@ int host_id = 1; //setting host ID = 0
 
 void *advertisement(void *args)
 {
-
     struct adv *sh = (struct adv *)args;
 
     while(1)
@@ -87,9 +86,7 @@ void *advertisement(void *args)
 
             sh->my_adv_port->sendPacket(adv_packet);
             //            cout<<"Ad sent"<<endl;
-
         } //closes for
-
         sleep(advertisementInterval); //do this every 10 seconds.
     } //closes while
 
@@ -276,6 +273,9 @@ void AddContent(string contentId)
 int main(int argc, char * argv[])
 {
     //    cout<<"I am "<<argv[1]<<endl;
+    //ADD specific content to the host's directory
+    for(int i = 2; i < argc; i++)
+        AddContent(argv[i]);
 
     pthread_t thread; //for advertising
     pthread_t thread2; //for receiving all information

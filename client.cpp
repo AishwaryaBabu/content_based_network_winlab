@@ -113,6 +113,57 @@ struct hostnames SetupAddress(char *argv)
     return Hname;    
 }
 
+void GetContent(string contentId, struct res *args)
+{
+    Packet *req_packet;
+    req_packet = new Packet();
+    req_packet->setPayloadSize(0); //No Payload
+
+    PacketHdr *rqhdr = req_packet->accessHeader();
+
+    rqhdr->setHeaderSize(3); //Need 3 bytes for the header
+    rqhdr->setOctet('0',0); //Request packet = type 0
+    rqhdr->setOctet((char)host_id,2); //Setting host id
+
+    int contentId_int = atoi(contentId.c_str());
+
+    rqhdr->setOctet((char)contentId_int,1); //Setting content request message
+
+    args->my_req_port->sendPacket(req_packet);
+    args->my_req_port->lastPkt_ = req_packet;
+    //cout<<"First octet "<<rqhdr->getOctet(0)<<"Second Octet "<<rqhdr->getOctet(1)<<"Third Octet "<<rqhdr->getOctet(2)<<endl;
+    cout<<"Sent Request"<<endl;
+    args->my_req_port->setACKflag(false);
+    args->my_req_port->timer_.startTimer(5);
+
+    while(!args->my_req_port->isACKed())
+    {
+        sleep(1);
+        if(!args->my_req_port->isACKed())
+        {
+            sleep(3);
+            if(!args->my_req_port->isACKed())
+            {
+                sleep(5);
+                if(!args->my_req_port->isACKed())
+                {
+                    sleep(7);
+                    if(!args->my_req_port->isACKed())
+                    {
+                        sleep(9);
+                        if(!args->my_req_port->isACKed())
+                        {
+                            cout<<"Giving up.."<<endl;							
+                            args->my_req_port->setACKflag(true);
+                        }	
+                    }
+                }
+            }
+        } 
+        else{return;}
+    }
+    return;
+}
 
 int main(int argc, char * argv[])
 {
@@ -180,53 +231,7 @@ int main(int argc, char * argv[])
 
         if(input.compare("get")==0)
         {
-            Packet *req_packet;
-            req_packet = new Packet();
-            req_packet->setPayloadSize(0); //No Payload
-
-            PacketHdr *rqhdr = req_packet->accessHeader();
-
-            rqhdr->setHeaderSize(3); //Need 3 bytes for the header
-            rqhdr->setOctet('0',0); //Request packet = type 0
-            rqhdr->setOctet((char)host_id,2); //Setting host id
-
-            int input2_int = atoi(input2.c_str());
-
-            rqhdr->setOctet((char)input2_int,1); //Setting content request message
-
-            my_req_port->sendPacket(req_packet);
-            my_req_port->lastPkt_ = req_packet;
-            //cout<<"First octet "<<rqhdr->getOctet(0)<<"Second Octet "<<rqhdr->getOctet(1)<<"Third Octet "<<rqhdr->getOctet(2)<<endl;
-            cout<<"Sent Request"<<endl;
-            my_req_port->setACKflag(false);
-            my_req_port->timer_.startTimer(5);
-
-            while(!my_req_port->isACKed())
-            {
-                sleep(1);
-                if(!my_req_port->isACKed())
-                {
-                    sleep(3);
-                    if(!my_req_port->isACKed())
-                    {
-                        sleep(5);
-                        if(!my_req_port->isACKed())
-                        {
-                            sleep(7);
-                            if(!my_req_port->isACKed())
-                            {
-                                sleep(9);
-                                if(!my_req_port->isACKed())
-                                {
-                                    cout<<"Giving up.."<<endl;							
-                                    my_req_port->setACKflag(true);
-                                }	
-                            }
-                        }
-                    }
-                } 
-                else{continue;}
-            }
+            GetContent(input2, sh2);
         }
 
         if(input.compare("exit")==0)
