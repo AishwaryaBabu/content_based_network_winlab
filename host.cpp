@@ -264,12 +264,34 @@ void AddContent(string contentId)
         {
             cout<<content[n]<<", ";
         }
-
-        printf("\n");
+        cout<<endl;
     } //closes else
 
 }
 
+void DeleteContent()
+{
+    string path_r = "rm " + input2;
+    const char* content_remove = path_r.c_str();
+    system(content_remove);
+
+    for( std::vector<int>::iterator iter = content.begin(); iter !=content.end();++iter)
+    {
+        if(*iter == atoi(input2.c_str()))
+        {
+            content.erase(iter);
+            cout<< "Content "<<input2<<" deleted"<<endl;
+            break;
+        }
+    }
+    for(unsigned int n=0;n<content.size();n++)
+    {
+        cout<<content[n]<<" ";
+    }
+    cout<<endl;
+}
+
+//Sample run:$ ./host connectionsList 1 3 5
 int main(int argc, char * argv[])
 {
     //    cout<<"I am "<<argv[1]<<endl;
@@ -358,85 +380,12 @@ int main(int argc, char * argv[])
 
         if(input.compare("add")==0)
         {
-        AddContent(input2);
+            AddContent(input2);
         } //closes if compare
-
-        if(input.compare("get")==0)
-        {
-            Packet *req_packet;
-            req_packet = new Packet();
-            req_packet->setPayloadSize(0); //No Payload
-
-            PacketHdr *rqhdr = req_packet->accessHeader();
-
-            rqhdr->setHeaderSize(3); //Need 3 bytes for the header
-            rqhdr->setOctet('0',0); //Request packet = type 0
-            rqhdr->setOctet((char)host_id,2); //Setting host id
-
-            int input2_int = atoi(input2.c_str());
-
-            rqhdr->setOctet((char)input2_int,1); //Setting content request message
-
-            my_req_port->sendPacket(req_packet);
-            my_req_port->lastPkt_ = req_packet;
-            //cout<<"First octet "<<rqhdr->getOctet(0)<<"Second Octet "<<rqhdr->getOctet(1)<<"Third Octet "<<rqhdr->getOctet(2)<<endl;
-            cout<<"Sent Request"<<endl;
-            my_req_port->setACKflag(false);
-            my_req_port->timer_.startTimer(5);
-
-            while(!my_req_port->isACKed())
-            {
-                sleep(1);
-                if(!my_req_port->isACKed())
-                {
-                    sleep(3);
-                    if(!my_req_port->isACKed())
-                    {
-                        sleep(5);
-                        if(!my_req_port->isACKed())
-                        {
-                            sleep(7);
-                            if(!my_req_port->isACKed())
-                            {
-                                sleep(9);
-                                if(!my_req_port->isACKed())
-                                {
-                                    cout<<"Giving up.."<<endl;							
-                                    my_req_port->setACKflag(true);
-                                }	
-                            }
-                        }
-                    }
-                } 
-                else{continue;}
-            }
-        }
 
         if(input.compare("delete")==0)
         {
-            string path_r = "rm " + input2;
-            const char* content_remove = path_r.c_str();
-            system(content_remove);
-
-            for( std::vector<int>::iterator iter = content.begin(); iter !=content.end();++iter)
-            {
-
-                if(*iter == atoi(input2.c_str()))
-                {
-                    content.erase(iter);
-                    cout<< "Content "<<input2<<" deleted"<<endl;
-                    break;
-                }
-            }
-
-            for(unsigned int n=0;n<content.size();n++)
-            {
-                cout<<content[n]<<" ";
-            }
-
-            printf("\n");
-
-
+            DeleteContent(input2);
         }
 
         if(input.compare("exit")==0)

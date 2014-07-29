@@ -165,11 +165,9 @@ void GetContent(string contentId, struct res *args)
     return;
 }
 
+// sample run:$ ./client connectionsList 1 
 int main(int argc, char * argv[])
 {
-    //    cout<<"I am "<<argv[1]<<endl;
-
-    //    pthread_t thread; //for advertising
     pthread_t thread2; //for receiving all information
 
     //create advertising sending port with the destination port included. Then we will asend it to the thread.
@@ -228,7 +226,8 @@ int main(int argc, char * argv[])
         //get user input on
         cout << "Prompt> ";
         cin >> input >> input2;      
-
+ 
+//        GetContent(argv[2], sh2); //The call to get a single content when the client comes up
         if(input.compare("get")==0)
         {
             GetContent(input2, sh2);
@@ -240,7 +239,5 @@ int main(int argc, char * argv[])
             return 0;
         }
     } //while close
-
-
     return 0;
 }
