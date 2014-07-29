@@ -1,0 +1,6 @@
+1. Downloading code into nodes using rspec
+    installed in /users/content_based_network
+2. Run host/ router/ client code separately on the groups using LabWiki 
+3. Set loss = lossPercent in each file
+4. delay is set to 1 second since earlier all devices were local host / now they are all in the same rack
+    right now lossPercent is MACROS : change to maybe static variable

@@ -20,3 +20,5 @@ broadcast works but without INADDR_ANY and uses broadcast ip but not interface's
 
 host.cpp:326 needs generalizing 
 Hostname as part of the packet or router needs to keep entry of the incoming interface as part of the pending request table to avoid double forwarding of messages
+
+in runClient.sh : create directory for client
