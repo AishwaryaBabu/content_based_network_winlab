@@ -124,11 +124,6 @@ onEvent(:ALL_UP_AND_INSTALL) do |node|
   info("Starting client2")
   group("client2").startApplications  
 
-  after 100 do
-    info(" ------ Now stop my app")
-    group('video_group1').stopApplications
-  end
-
   after 105 do
     info(" ----- Stopping all applications")
     allGroups.stopApplications

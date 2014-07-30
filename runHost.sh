@@ -10,6 +10,8 @@ do
 done
     echo $contentIdString
 
+cd /users/content_based_network/
+sudo make clean
 sudo make
 sudo ./getIfAddr
 sudo mkdir "Host" 

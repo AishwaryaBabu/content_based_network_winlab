@@ -269,7 +269,7 @@ void AddContent(string contentId)
 
 }
 
-void DeleteContent()
+void DeleteContent(string input2)
 {
     string path_r = "rm " + input2;
     const char* content_remove = path_r.c_str();
@@ -393,7 +393,6 @@ int main(int argc, char * argv[])
             cout <<"shutting down host" <<endl;
             return 0;
         }
-
 
     } //while close
 

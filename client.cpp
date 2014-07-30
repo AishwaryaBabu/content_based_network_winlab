@@ -170,6 +170,7 @@ int main(int argc, char * argv[])
 {
     pthread_t thread2; //for receiving all information
 
+    string getContentId = argv[2];
     //create advertising sending port with the destination port included. Then we will asend it to the thread.
     Address *my_res_addr; //We receive information from here
     Address *my_req_addr; //We request content from here
@@ -218,26 +219,10 @@ int main(int argc, char * argv[])
     //creating thread to receive
     pthread_create(&(thread2),0,&receivedata,sh2);
 
+    GetContent(getContentId, sh2);
     while(1)
     {
-        string input;
-        string input2;
-        //int hdrSize = 256;
-        //get user input on
-        cout << "Prompt> ";
-        cin >> input >> input2;      
- 
-//        GetContent(argv[2], sh2); //The call to get a single content when the client comes up
-        if(input.compare("get")==0)
-        {
-            GetContent(input2, sh2);
-        }
-
-        if(input.compare("exit")==0)
-        {
-            cout <<"shutting down host" <<endl;
-            return 0;
-        }
+        //So that program does not end
     } //while close
     return 0;
 }
