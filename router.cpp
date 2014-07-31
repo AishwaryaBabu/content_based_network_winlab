@@ -186,10 +186,8 @@ void AddRoutingTableEntry(int contentId, string recInterface, int numHops) //CHA
         }
     }
 
-    //cout<<"Ad received - Routing Table:"<<endl;   
-    //    Display2DVector(routingTable);
-    cout<<"Ad received: "<<endl;
-    DisplayRoutingTable();
+//    cout<<"Ad received: "<<endl;
+//    DisplayRoutingTable();
 }
 
 /*!
