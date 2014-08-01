@@ -2,6 +2,9 @@
   \file host.cpp
   \brief Implementation of host
 
+  Sample run:$ ./host connectionsList 1 3 5
+  Host contains certain content and services requests that it receives. At regular intervals the host sends advertisements to announce the content ids that it is hosting
+
   @author Sudarshan Kandi
   @author Rakesh Ravuru
   @author Aishwarya Babu
@@ -26,43 +29,55 @@
 using namespace std;
 
 static const int maxLineLength=400;
-static const int receivingPortNum = 6200;
-static const int sendingPortNum = 6300;
-static const int advPortNum = 6100;
+static const int receivingPortNum = 6200; //! Fixed receiving port number 
+static const int sendingPortNum = 6300; //! Fixed sending port number 
+static const int advPortNum = 6100; //! Fixed port number to send advertisements 
 
+/*! 
+  \brief Structure containing interface information of the host
+ */
 struct hostnames
 {
-    string hostname_self;
-    string hostname_bcast;
-    string if_name;
+    string hostname_self; //! IP address of the interface
+    string hostname_bcast; //! Broadcast IP address of the interface
+    string if_name; //! Interface name
 };
 
+/*!
+  \brief Structure containing advertisement port to send to advertisements thread
+
+  This structure is sent as argument to the function: void *advertisement(void *args)  
+ */
 struct adv
 {
     SendingPort *my_adv_port;
 };
 
+/*!
+  \brief Structure containing interface(port) information to send to receiver thread
+
+  This structure is sent as argument to the funciton: void *receivedata(void *args)
+ */
 struct res
 {
     LossyReceivingPort *my_res_port;
     mySendingPort *my_req_port;
 };
 
-std::vector<int> content; //vector of int type to hold content IDs hosted
+std::vector<int> content; //! Vector of int type to hold content IDs hosted
 int host_id = 1; //setting host ID = 0
 
-//setting up the requesting port; we need to initialize it globally because we need to be able to kill the timer from the receiving thread which is running independently of the main program.
+/*!
+  \brief Thread function which sends advertisements at regular intervals
 
+  The thread created runs a while loop sending advertisements at regular intervals on the  interface specified by the argument.
+  @param args The interface is specified by the arguments *args. 
+ */
 void *advertisement(void *args)
 {
     struct adv *sh = (struct adv *)args;
-
     while(1)
     {
-
-        // send using sh->my_adv_port
-        // destination address has already been trained to 10001
-
         int hops = 0; //setting default hop count from host.
 
         Packet *adv_packet;
@@ -78,21 +93,19 @@ void *advertisement(void *args)
         for (unsigned int i=0;i!=content.size();i++)
         {
             hdr->setOctet((char)content[i],1);
-            /*
-               cout << "The three octets are " << hdr->getOctet(0)<< ", " << hdr->getOctet(1) << ", " << hdr->getOctet(2) << endl;
-               cout << "The payload size is " << adv_packet->getPayloadSize() << endl;
-               cout << "The header size is " <<adv_packet->getHeaderSize() << endl;
-             */
-
             sh->my_adv_port->sendPacket(adv_packet);
-            //            cout<<"Ad sent"<<endl;
-        } //closes for
+        } 
         sleep(advertisementInterval); //do this every 10 seconds.
-    } //closes while
-
+    }
     return NULL;    
-} //closes void
+}
 
+/*!
+  \brief Thread function which is waiting for packets on the interface specified
+
+  The thread created runs a while loop waiting to receive packets on the interface specified by the argument.
+  @param args The interface is specified by the arguments *args. 
+ */
 void *receivedata(void *args)
 {
     /*REQ Packet - Type 0
@@ -105,9 +118,7 @@ void *receivedata(void *args)
     short size;
     while(1)
     {
-
         q = sh2->my_res_port->receivePacket();
-
         if (q!= NULL)
         {
             char type = q->accessHeader()->getOctet(0);
@@ -129,7 +140,6 @@ void *receivedata(void *args)
                 outputstring[1] = q->getPayload();//get the payload
                 outputFile <<outputstring[1];//write the payload to the output file
                 cout<<"Received response- content "<<c_id<<endl; //acknowledge to the user that we are done writing.
-
             }
             //Servicing a request
             else if (type == '0')
@@ -190,13 +200,14 @@ void *receivedata(void *args)
                     cout<<"Sent Response- content "<<c_id<<endl;
                 }
             }
-
-        } //Closes if
-    }//Closes while
+        }
+    }
     return NULL;
+}
 
-}//Closes void
-
+/*!
+  \brief Sets up the interface information into the structure #hostnames
+ */
 struct hostnames SetupAddress(char *argv)
 {
     string connectionsFilename(argv);
@@ -265,10 +276,15 @@ void AddContent(string contentId)
             cout<<content[n]<<", ";
         }
         cout<<endl;
-    } //closes else
-
+    }
 }
 
+/*!
+  \brief Delete a specific content id
+
+  The content id is removed from the directory and from the Contents list
+  @param input2 Content Id (string) to be deleted
+ */
 void DeleteContent(string input2)
 {
     string path_r = "rm " + input2;
@@ -291,7 +307,11 @@ void DeleteContent(string input2)
     cout<<endl;
 }
 
-//Sample run:$ ./host connectionsList 1 3 5
+/*!
+  \brief Main function
+
+  Defines the required interfaces (ports) and creates threads for advertisements and receiving packets
+ */
 int main(int argc, char * argv[])
 {
     //    cout<<"I am "<<argv[1]<<endl;

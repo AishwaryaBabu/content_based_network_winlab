@@ -1,3 +1,12 @@
+/*!
+  \file getIfAddr.cpp
+  \brief Obtains information about all the interfaces of the node
+
+  Sample run:$ ./getIfAddr
+Reference : http://man7.org/linux/man-pages/man3/getifaddrs.3.html
+
+@author Aishwarya Babu
+ */
 #include <sys/types.h>
 #include <ifaddrs.h>
 #include <cstdlib>
@@ -13,11 +22,10 @@
 
 using namespace std;
 
-
 int main(int argc, char *argv[])
 {
 
-    struct ifaddrs *ifaddr, *ifa; //ifa pointer iterator 
+    struct ifaddrs *ifaddr, *ifa; // ifa pointer iterator 
     char host[NI_MAXHOST];
 
     string connectionsFilename("connectionsList");
@@ -34,7 +42,7 @@ int main(int argc, char *argv[])
     char hostname[1024];
     hostname[1023] = '\0';
     gethostname(hostname, 1023);
-//    cout<<hostname<<endl;
+    //    cout<<hostname<<endl;
     connectionsFile<<hostname<<endl;
 
     int n;

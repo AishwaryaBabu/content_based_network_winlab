@@ -1,3 +1,15 @@
+/*!
+  \file client.cpp
+  \brief Implementation of Client
+
+  Sample run:$ ./router connectionsList 1
+  Client only makes requests for content
+
+  @author Aishwarya Babu
+  @author Rakesh Ravuru
+  @author Sudarshan Kandi
+ */
+
 #include "common.h"
 #include "newport.h"
 #include <iostream>
@@ -17,16 +29,24 @@
 using namespace std;
 
 static const int maxLineLength=400;
-static const int receivingPortNum = 6200;
-static const int sendingPortNum = 6300;
-static const int advPortNum = 6100;
+static const int receivingPortNum = 6200; //! Fixed receiving port number
+static const int sendingPortNum = 6300; //! Fixed sending port number
 
+/*! 
+  \brief Structure containing interface information of the client
+ */
 struct hostnames
 {
     string hostname_self;
     string hostname_bcast;
     string if_name;
 };
+
+/*!
+  \brief Structure containing interface(port) information to send to receiver thread
+
+  This structure is sent as argument to the funciton: void *receivedata(void *args)
+ */
 struct res
 {
     LossyReceivingPort *my_res_port;
@@ -34,7 +54,12 @@ struct res
 };
 int host_id = 1; //Host ID for 
 
+/*!
+  \brief Thread function which is waiting for packets on the interface specified
 
+  The thread created runs a while loop waiting to receive packets on the interface specified by the argument.
+  @param args The interface is specified by the arguments *args. 
+ */
 void *receivedata(void *args)
 {
     /*REQ Packet - Type 0
@@ -42,9 +67,7 @@ void *receivedata(void *args)
       ADV Packet - Type 2*/
 
     struct res *sh2 = (struct res *)args;
-    //    FILE *data;
     Packet *q;
-    //    short size;
     while(1)
     {
         q = sh2->my_res_port->receivePacket();
@@ -70,15 +93,15 @@ void *receivedata(void *args)
                 outputstring[1] = q->getPayload();//get the payload
                 outputFile <<outputstring[1];//write the payload to the output file
                 cout<<"Received response- content "<<c_id<<endl; //acknowledge to the user that we are done writing.
-
             }
-
-        } //Closes if
-    }//Closes while
+        } 
+    }
     return NULL;
+}
 
-}//Closes void
-
+/*!
+  \brief Sets up the interface information into the structure #hostnames
+ */
 struct hostnames SetupAddress(char *argv)
 {
     string connectionsFilename(argv);
@@ -108,11 +131,15 @@ struct hostnames SetupAddress(char *argv)
         }
         i++;
     }
-
     inputFile.close();
     return Hname;    
 }
 
+/*
+   \brief Request a certain content by id
+
+   Function to send a packet requesting content and to resend the request if not received on the receiving thread
+ */
 void GetContent(string contentId, struct res *args)
 {
     Packet *req_packet;

@@ -2,6 +2,9 @@
   \file router.cpp
   \brief Implementation of router
 
+  Sample run:$ ./router connectionsList
+  Router forwards the packets depending on the type of the packet to the appropriate next hop based on the routingtable and pending request table. In case of advertisements, it forwards them via all interfaces except the one it wa received on
+
   @author Aishwarya Babu
   @author Rakesh Ravuru
   @author Sudarshan Kandi
@@ -22,42 +25,53 @@
 /** Delay to check and update timers in Routing and Pending Request tables */
 #define sleepDelay 1
 /** Loss percentage for Lossy receiving port*/
-#define lossPercent 0.2
+#define lossPercent 0.05
 using namespace std;
 
 static int globalTimer=0; //!< Global timer - Clock for the Routing and Pending Request Tables
-static vector<vector<string> >connectionsList; //!< Connections table- 2D vector mapping destination address to sending port+"receiving port"(interface) - MAY NOT BE REQUIRED WHEN WE WORK WITH BROADCAST ADDRESS 
+static vector<vector<string> >connectionsList; //!< Connections table- 2D vector keeping track of interface ip address + broadcast address + interface name 
 static const int maxLineLength=400;
-static const int receivingPortNum = 6200;
-static const int sendingPortNum = 6300;
+static const int receivingPortNum = 6200; //! Fixed receiving port number
+static const int sendingPortNum = 6300; //! Fixed sending port number 
 
 /*!
-  Argument to be send to <NodeRecProc>(void *arg)
+  \brief Structure containing interface/ port information for a thread 
+
+  Argument to be sent to <NodeRecProc>(void *arg)
  */
 struct cShared{
-    //    string receivingInterface;
     LossyReceivingPort* fwdRecvPort;
-    mySendingPort* fwdSendPort;
-    int position;
-    //  int max;
+    mySendingPort* fwdSendPort; 
+    int position; //!Location(index) in connections List
 };
 
+/*!
+  \brief Single row of the routing table
+
+  A single row of the routing table comprises : content id, the interface on which this content can be obtained, number of hops to this content, time for expiration of this information (updated based on advertisements)
+ */
 struct routingTableElement{
-    int contentId;
-    string recInterface;
-    int numHops;
-    int timeToExp; 
+    int contentId; //! Content Id available in the network
+    string recInterface; //! Interface on which the content can be reached 
+    int numHops; //! Least number of hops to this content 
+    int timeToExp;  //! Time for expiration of this information (updated by advertisements)
 };
 
+/*!
+  \brief Single row of the Pending request table
+
+  A single row of the pending request table comprises: the content id that has been requested, the id of the client(device) requesting it, the interface on which it has been received, time for expiration of this request 
+ */
 struct pendingTableElement{
-    int requestedContentId;
-    int requestingHostId;
-    string recInterface;
-    int timeToExp;  
+    int requestedContentId; //! Content Id that has been requested 
+    int requestingHostId; //! Id of the client/ host requesting the content
+    string recInterface; //! Interface on which the request is received 
+    int timeToExp;  //! Time for expiration of the request
 };
 
 static vector<routingTableElement> routingTable; //!< Routing table- content id + receiving port + #hops + time to expire
 static vector<pendingTableElement> pendingRequestTable; //!< Pending request table- Requested id + host id + destination port + time to expire
+
 /*!
   \brief Displays 2dimensional vector/ table
 
@@ -86,6 +100,7 @@ void DisplayConnectionsList()
     }
     cout<<endl;
 }
+
 /*!
   \brief Creates a list of mapping between receiving, destination and sending ports
 
@@ -96,17 +111,16 @@ void DisplayConnectionsList()
  */
 void CreateConnectionsList(char* argv)
 {
-
     string connectionsFilename(argv); 
     //    vector<string> inputDataLines;
     fstream inputFile;
-    char temp[maxLineLength];
-    char temp1[maxLineLength];
-    char temp2[maxLineLength];
+    char temp[maxLineLength]; //Interface name
+    char temp1[maxLineLength]; //Interface IP address 
+    char temp2[maxLineLength]; //Interface Broadcast address
 
     int i = 1;
     inputFile.open(connectionsFilename.c_str(), fstream::in);
-    
+
     string self;
     getline(inputFile, self);
 
@@ -146,7 +160,7 @@ void DisplayRoutingTable()
 void AddRoutingTableEntry(int contentId, string recInterface, int numHops) //CHANGE RECPORTNUM to HOSTNAME - BROADCAST IP (all ports 6200 - receive)
 {
     numHops+=1;
-    //    int dstPortNum = SearchConnectionsTable(recPortNum);
+
     //Using config information build routing table
     if(routingTable.size()==0)
     {
@@ -185,9 +199,6 @@ void AddRoutingTableEntry(int contentId, string recInterface, int numHops) //CHA
             routingTable.push_back(rtElem);
         }
     }
-
-//    cout<<"Ad received: "<<endl;
-//    DisplayRoutingTable();
 }
 
 /*!
@@ -199,7 +210,6 @@ void UpdateRoutingTableEntryTTL()
     {
         routingTable[i].timeToExp = routingTable[i].timeToExp - timerWrap;
     }
-
 }
 
 /*!
@@ -211,8 +221,6 @@ void DeleteRoutingTableEntry(int row)
 {
     routingTable.erase(routingTable.begin()+row);
     cout<<"Deleted entry - Routing Tab:"<<endl;
-    //    Display2DVector(routingTable);
-
 }
 
 /*!
@@ -227,11 +235,9 @@ void CheckRoutingTableEntryExpired(int currentTime)
         if(routingTable[i-1].timeToExp == currentTime)
         {
             DeleteRoutingTableEntry(i-1);
-            //routingTable.erase(routingTable.begin()+i-1);
             i--; // to ensure the deletion of 0th entry
         }
     }
-
 }
 
 /*!
@@ -248,10 +254,8 @@ string getReceivingInterface(int requestedContentId)
     }
     //    return NULL;
     return ""; 
-
     //return NULL gave terminate called after throwing an instance of 'std::logic_error'
     //  what():  basic_string::_S_construct null not valid
-
 }
 
 /*!
@@ -298,14 +302,11 @@ void DisplayPendingRequestTable()
 /*!
   \brief Make a new entry in the Pending request Table or update an already existing entry
  */
-void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, string recInterface) //USE HOSTNAME? BROADCAST IP INSTEAD
+void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, string recInterface)
 {
     struct pendingTableElement prtElem;
     prtElem.requestedContentId = requestedContentId;
     prtElem.requestingHostId = requestingHostId;
-
-    //Maintain destination Port numbers at PRT  
-    //    int destPort = SearchConnectionsTable(receivingPort);
 
     bool contentExists = false;
     for(unsigned int i = 0; i < pendingRequestTable.size(); i++)
@@ -323,10 +324,7 @@ void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, str
         prtElem.recInterface = recInterface;
         prtElem.timeToExp = globalTimer+prtTimeToExpire; // Time to expire
         pendingRequestTable.push_back(prtElem);
-
     }
-    //    cout<<"Request recd - Pending Req Tab:"<<endl;
-    //    Display2DVector(pendingRequestTable);
     cout<<"Request Received: "<<endl;
     DisplayPendingRequestTable();
 }
@@ -341,7 +339,6 @@ void UpdatePendingRequestTableTTL()
         pendingRequestTable[i].timeToExp = pendingRequestTable[i].timeToExp - timerWrap;
     }
     cout<<"Updated TTL - Pending Request Table"<<endl;
-    //    Display2DVector(pendingRequestTable);
 }
 
 /*!
@@ -362,9 +359,6 @@ void DeletePendingRequestTableEntry(int requestedContentId, int requestingHostId
     cout<<"Deleted entry - PRT:"<<endl;
     if(pendingRequestTable.size()==0)
         cout<<"No pending req"<<endl;
-    //    else
-    //        Display2DVector(pendingRequestTable);
-
 }
 
 /*!
@@ -381,7 +375,6 @@ void CheckPendingRequestTableExpired(int currentTime)
             int contentID = pendingRequestTable[i-1].requestedContentId;
             int hostID = pendingRequestTable[i-1].requestingHostId;
             DeletePendingRequestTableEntry(contentID, hostID);
-            //            pendingRequestTable.erase(pendingRequestTable.begin()+i-1);
             i--; // to ensure the deletion of 0th entry
         }
     }
@@ -397,7 +390,7 @@ string SearchPendingRequestTable(int contentId, int hostId)
         if(contentId==pendingRequestTable[i].requestedContentId && hostId==pendingRequestTable[i].requestingHostId)
             return pendingRequestTable[i].recInterface;
     }
-//    return NULL;
+    //    return NULL;
     return "";
 }
 
@@ -435,26 +428,19 @@ void* NodeRecProc(void* arg)
     //Packet received : needs to be checked for appropriate forwarding and editing of table
     while(true)
     {
-//        cout<<"At: "<<sh->receivingInterface<<" thread id: "<<(int)pthread_self()<<endl;
-
         recvPacket = sh->fwdRecvPort->receivePacket();
         if(recvPacket != NULL)
         {
-            //            sh->fwdSendPort->sendPacket(recvPacket);
-            //Request Packet
+            //Packet type: Request
             if(recvPacket->accessHeader()->getOctet(0) == '0')
             {
                 int requestedContentId = int(recvPacket->accessHeader()->getOctet(1));
                 int requestingHostId = int(recvPacket->accessHeader()->getOctet(2)); 
-                //                string receivingInterface = sh->receivingInterface;
                 int position = sh->position;
                 string receivingInterface = connectionsList[position][1];
 
-
                 //Look up routing table based on content id and Forward to appropriate next hop
-
                 string nextHopRecvInterface = getReceivingInterface(requestedContentId);
-                //                int nextHopDestPortNum = SearchConnectionsTable(nextHopRecvPortNum);
                 Address* dstAddr = new Address(nextHopRecvInterface.c_str(), receivingPortNum);
                 sh->fwdSendPort->setRemoteAddress(dstAddr);
                 sh->fwdSendPort->sendPacket(recvPacket);
@@ -480,7 +466,6 @@ void* NodeRecProc(void* arg)
                     //Delete from pending request table entry
                     DeletePendingRequestTableEntry(requestedContentId, requestingHostId);
                 }
-
             }
             //Announcement
             else if(recvPacket->accessHeader()->getOctet(0) == '2')
@@ -515,12 +500,9 @@ void* NodeRecProc(void* arg)
                     }
                 }
 
-
                 if(forwardFlag || noEntry)
                 {
                     AddRoutingTableEntry(receivedContentId, receivingInterface, numHops); //Takes care of updating timer and comparing num Hops
-                    //Routing table converts receiving port num to appropriate dest port num
-                    //Increment number of hops
                     numHops++;
                     recvPacket->accessHeader()->setOctet(char(numHops), 2);
 
@@ -532,7 +514,6 @@ void* NodeRecProc(void* arg)
                         string destInterface = connectionsList[i][1];
                         if(destInterfaceToSkip != destInterface)
                         {
-                            //                        cout<<destPort<<endl;
                             Address* dstAddr = new Address(destInterface.c_str(), receivingPortNum);
                             sh->fwdSendPort->setRemoteAddress(dstAddr);
                             sh->fwdSendPort->sendPacket(recvPacket);
@@ -551,13 +532,11 @@ void* NodeRecProc(void* arg)
  */
 void StartNodeThread(pthread_t* thread, int position)
 {
-
     //setup ports numbers
-    Address* recvAddr;  //receive from port corresponding to node2 
-    Address* sendAddr; // sending port corresponding to node1
-    //    Address* dstAddr;  //address of node1 //NEEDS TO GO
-    mySendingPort* sendPort; //sending port corr to send_addr
-    LossyReceivingPort* recvPort; //receiving port corr to recvAddr;
+    Address* recvAddr;  //! Address of destination - Set to the broadcast address 
+    Address* sendAddr; //! Address of the sending interface - Set to IP address of interface
+    mySendingPort* sendPort; //! Sending port corresponding to sendAddr
+    LossyReceivingPort* recvPort; //!Receiving port corresponding to recvAddr
 
     try{
         recvAddr = new Address(connectionsList[position][1].c_str(), receivingPortNum);  //CHANGE "localhost" to second argument and ports[0] to 6200
@@ -573,7 +552,6 @@ void StartNodeThread(pthread_t* thread, int position)
         sendPort = new mySendingPort();
         sendPort->setAddress(sendAddr);
         sendPort->setBroadcast();  //ADD THIS
-        //        sendPort->setRemoteAddress(dstAddr); //NEEDS TO GO 
 
         sendPort->init();
         recvPort->init();
@@ -585,14 +563,10 @@ void StartNodeThread(pthread_t* thread, int position)
 
     //pthread_create() - with sender
     struct cShared *sh;
-    //    sh = (struct cShared*)malloc(sizeof(struct cShared));
     sh = new struct cShared;
     sh->fwdRecvPort = recvPort;
     sh->fwdSendPort = sendPort;
-    //    sh->receivingInterface = hostnames[0]; //Change to new instead of malloc
     sh->position = position;
-    //    sh->max = n;
-    //    pthread_t thread;
     pthread_create(thread, 0, &NodeRecProc, sh);
     //    pthread_join(thread, NULL);
 }
@@ -602,14 +576,7 @@ void StartNodeThread(pthread_t* thread, int position)
  */
 int main(int argc, char* argv[])
 {
-
-    cout<<"I am router"<<endl;
-    //sender 4000
-    //receiver localhost 4001 
-
-    //CREATE CONNECTIONS LIST: COPY BROADCAST ADDRESSES INTO VECTOR
     CreateConnectionsList(argv[1]);
-    //    Display2DVector(connectionsList);
     DisplayConnectionsList();
 
     int N = connectionsList.size();
