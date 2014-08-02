@@ -108,7 +108,7 @@ void *advertisement(void *args)
  */
 void *receivedata(void *args)
 {
-    /*REQ Packet - Type 0
+    /*REQ Packet - Type 0 
       RES Packet - Type 1   - to be implemented in client
       ADV Packet - Type 2*/
 
@@ -122,27 +122,8 @@ void *receivedata(void *args)
         if (q!= NULL)
         {
             char type = q->accessHeader()->getOctet(0);
-            //Receiving response
-            if (type == '1')
-            {
-                sh2->my_req_port->setACKflag(true);
-                sh2->my_req_port->timer_.stopTimer();
-                char *outputstring[1];
-                ofstream outputFile;
-                int c_id = (int)q->accessHeader()->getOctet(1); //Get the content ID for which a file needs to be made.
-
-                stringstream ss;
-                ss << c_id;
-                std::string str = ss.str();
-                const char* chr = str.c_str();
-
-                outputFile.open(chr,std::fstream::out |std::fstream::trunc); //create a file with the same name
-                outputstring[1] = q->getPayload();//get the payload
-                outputFile <<outputstring[1];//write the payload to the output file
-                cout<<"Received response- content "<<c_id<<endl; //acknowledge to the user that we are done writing.
-            }
             //Servicing a request
-            else if (type == '0')
+            if (type == '0')
             {
                 int c_id = (int)q->accessHeader()->getOctet(1);
                 cout<<"Received request for content "<<c_id<<endl;

@@ -135,7 +135,7 @@ struct hostnames SetupAddress(char *argv)
     return Hname;    
 }
 
-/*
+/*!
    \brief Request a certain content by id
 
    Function to send a packet requesting content and to resend the request if not received on the receiving thread
@@ -192,7 +192,11 @@ void GetContent(string contentId, struct res *args)
     return;
 }
 
-// sample run:$ ./client connectionsList 1 
+/*!
+  \brief Main function
+
+  Defines the required interfaces (ports) and creates thread for receiving packets
+ */
 int main(int argc, char * argv[])
 {
     pthread_t thread2; //for receiving all information

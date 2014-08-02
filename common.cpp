@@ -1,3 +1,8 @@
+/*!
+  \file common.cpp
+  \brief Class and variable definitions for common.h
+ */
+
 #include "common.h"
 #include <stdio.h>
 #include <iostream>

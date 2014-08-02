@@ -441,13 +441,17 @@ void* NodeRecProc(void* arg)
 
                 //Look up routing table based on content id and Forward to appropriate next hop
                 string nextHopRecvInterface = getReceivingInterface(requestedContentId);
-                Address* dstAddr = new Address(nextHopRecvInterface.c_str(), receivingPortNum);
-                sh->fwdSendPort->setRemoteAddress(dstAddr);
-                sh->fwdSendPort->sendPacket(recvPacket);
-                delete(dstAddr);
 
-                //Make entry in pending request table                 
-                UpdatePendingRequestTable(requestedContentId, requestingHostId, receivingInterface); //PRT converts receiving port to dest port
+                if(nextHopRecvInterface != receivingInterface) //Broadcast causes re sending of request to self
+                {
+                    Address* dstAddr = new Address(nextHopRecvInterface.c_str(), receivingPortNum);
+                    sh->fwdSendPort->setRemoteAddress(dstAddr);
+                    sh->fwdSendPort->sendPacket(recvPacket);
+                    delete(dstAddr);
+
+                    //Make entry in pending request table                 
+                    UpdatePendingRequestTable(requestedContentId, requestingHostId, receivingInterface); //PRT converts receiving port to dest port
+                }
             }
             //Response Packet
             else if(recvPacket->accessHeader()->getOctet(0) == '1')
