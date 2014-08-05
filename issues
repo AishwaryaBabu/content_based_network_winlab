@@ -22,3 +22,6 @@ host.cpp:326 needs generalizing
 Hostname as part of the packet or router needs to keep entry of the incoming interface as part of the pending request table to avoid double forwarding of messages
 
 in runClient.sh : create directory for client
+
+
+clock() returns 0 on the nodes

@@ -22,7 +22,7 @@
 #include <sstream>
 #include <algorithm> 		//needed to do the find command
 #include <cstdlib>
-
+#include <ctime>
 #define advertisementInterval 10
 #define lossPercent 0.05
 
@@ -31,7 +31,8 @@ using namespace std;
 static const int maxLineLength=400;
 static const int receivingPortNum = 6200; //! Fixed receiving port number
 static const int sendingPortNum = 6300; //! Fixed sending port number
-
+static clock_t rtt;
+static const string rttFilename = "rtt.txt";
 /*! 
   \brief Structure containing interface information of the client
  */
@@ -78,6 +79,9 @@ void *receivedata(void *args)
             //Receiving response
             if (type == '1')
             {
+                rtt = clock() - rtt;
+                double timeTaken = double(rtt)/ CLOCKS_PER_SEC * 1000;
+ 
                 sh2->my_req_port->setACKflag(true);
                 sh2->my_req_port->timer_.stopTimer();
                 char *outputstring[1];
@@ -93,6 +97,13 @@ void *receivedata(void *args)
                 outputstring[1] = q->getPayload();//get the payload
                 outputFile <<outputstring[1];//write the payload to the output file
                 cout<<"Received response- content "<<c_id<<endl; //acknowledge to the user that we are done writing.
+                outputFile.close();
+                //Time between asking and receiving requested content
+//                ofstream outputFile;
+                outputFile.open(rttFilename.c_str());
+                outputFile <<timeTaken <<" "<< "ms"<<endl;
+                outputFile.close();
+                
             }
         } 
     }
@@ -159,6 +170,8 @@ void GetContent(string contentId, struct res *args)
     args->my_req_port->sendPacket(req_packet);
     args->my_req_port->lastPkt_ = req_packet;
     //cout<<"First octet "<<rqhdr->getOctet(0)<<"Second Octet "<<rqhdr->getOctet(1)<<"Third Octet "<<rqhdr->getOctet(2)<<endl;
+
+    rtt = clock();
     cout<<"Sent Request"<<endl;
     args->my_req_port->setACKflag(false);
     args->my_req_port->timer_.startTimer(5);

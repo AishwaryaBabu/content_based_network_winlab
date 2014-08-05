@@ -1,3 +1,8 @@
+1. tar file on dropbox
+2. rspec updated to have the nodes install from the dropbox link
+3. Setup resources using geni portal/ flack - ccn_ababu.rspec
+4. labwiki ccn_ababu.oedl
+
 1. Downloading code into nodes using rspec
     installed in /users/content_based_network
 2. Run host/ router/ client code separately on the groups using LabWiki 

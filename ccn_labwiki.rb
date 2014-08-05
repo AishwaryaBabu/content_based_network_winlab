@@ -1,11 +1,13 @@
+#node definitions
 defProperty('r1', "r1-labZero", "Router 1")
 defProperty('r2', "r2-labZero", "Router 2")
-defProperty('r3', "r2-labZero", "Router 3")
+defProperty('r3', "r3-labZero", "Router 3")
 defProperty('h1', "h1-labZero", "Host 1")
 defProperty('h2', "h2-labZero", "Host 2")
 defProperty('c1', "c1-labZero", "Client 1")
 defProperty('c2', "c2-labZero", "Client 2")
 
+#application definitons
 defApplication('runRouter') do |app|
   app.description = "Runs router"
   app.binary_path = '/bin/bash /users/content_based_network/runRouter.sh'
@@ -23,6 +25,7 @@ defApplication('runClient') do |app|
   app.defProperty('content_id_get', "This is a string of content ids the node asks for", :type=> :string)
 end
 
+#Group definitions
 defGroup('routers', property.r1, property.r2, property.r3) do |node|
   node.addApplication("runRouter") do |app|
   end
@@ -52,6 +55,7 @@ defGroup('client2', property.c2) do |node|
   end
 end
 
+#Starting program
 onEvent(:ALL_UP_AND_INSTALLED) do |event|
   after 5 do
     info("Starting routers")
