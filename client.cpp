@@ -107,7 +107,7 @@ void *receivedata(void *args)
                 //Time between asking and receiving requested content
 //                ofstream outputFile;
                 outputFile.open(rttFilename.c_str());
-                outputFile <<timeTaken <<" "<< "ms"<<endl;
+                outputFile <<timeTaken<<endl;
                 outputFile.close();
                 
             }
@@ -140,7 +140,7 @@ struct hostnames SetupAddress(char *argv)
     while(inputFile >> temp >> temp1 >> temp2)
     {
         i++;
-        if(i > 3)
+        if(i > 3) //4th entry in connectionsList 
         {
             Hname.hostname_self = string(temp1);
             Hname.hostname_bcast = string(temp2);
