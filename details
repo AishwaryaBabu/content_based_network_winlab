@@ -1,7 +1,8 @@
 1. tar file on dropbox
 2. rspec updated to have the nodes install from the dropbox link
-3. Setup resources using geni portal/ flack - ccn_ababu.rspec
-4. labwiki ccn_ababu.oedl
+3. Setup resources using geni portal/ flack - ccn2_ababu.rspec
+3.5 At each client - generate ssh-keygen : copy keygen into public auth keys of server 
+4. labwiki ccn2_ababu.oedl - provide user@ipaddress as an argument. 
 
 1. Downloading code into nodes using rspec
     installed in /users/content_based_network
