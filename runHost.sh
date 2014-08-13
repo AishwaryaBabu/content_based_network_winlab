@@ -11,9 +11,11 @@ done
     echo $contentIdString
 
 cd /users/content_based_network/
+sudo rm -r "Host/"
 sudo make clean
 sudo make
 sudo ./getIfAddr
+
 sudo mkdir "Host" 
 sudo cp host ./"Host"
 sudo cp connectionsList ./"Host"

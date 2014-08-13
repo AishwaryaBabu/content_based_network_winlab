@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/local/bin/ruby
 require 'rubygems'
 require 'oml4r'
 require 'file-tail'

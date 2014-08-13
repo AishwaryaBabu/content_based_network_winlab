@@ -25,7 +25,7 @@
 /** Delay to check and update timers in Routing and Pending Request tables */
 #define sleepDelay 1
 /** Loss percentage for Lossy receiving port*/
-#define lossPercent 0.05
+#define lossPercent 0.0
 using namespace std;
 
 static int globalTimer=0; //!< Global timer - Clock for the Routing and Pending Request Tables
@@ -325,8 +325,8 @@ void UpdatePendingRequestTable(int requestedContentId, int requestingHostId, str
         prtElem.timeToExp = globalTimer+prtTimeToExpire; // Time to expire
         pendingRequestTable.push_back(prtElem);
     }
-    cout<<"Request Received: "<<endl;
-    DisplayPendingRequestTable();
+//    cout<<"Request Received: "<<endl;
+//    DisplayPendingRequestTable();
 }
 
 /*!
@@ -356,7 +356,7 @@ void DeletePendingRequestTableEntry(int requestedContentId, int requestingHostId
             break;
         }
     }
-    cout<<"Deleted entry - PRT:"<<endl;
+//    cout<<"Deleted entry - PRT:"<<endl;
     if(pendingRequestTable.size()==0)
         cout<<"No pending req"<<endl;
 }

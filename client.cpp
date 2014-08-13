@@ -25,7 +25,7 @@
 #include <ctime>
 #include <sys/time.h>
 #define advertisementInterval 10
-#define lossPercent 0.05
+#define lossPercent 0.0
 
 using namespace std;
 
